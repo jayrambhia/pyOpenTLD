@@ -1,4 +1,4 @@
-#namespace TLD
+from pyOpenTLD.mftracker.fbtrack import *
 from math import floor
 class MedianFlowTracker:
     trackerBB = []
@@ -25,7 +25,3 @@ class MedianFlowTracker:
                 pass
             else:
                 self.trackerBB = [x,y,w,h]
-            
-            
-
-        

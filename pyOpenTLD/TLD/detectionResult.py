@@ -1,4 +1,5 @@
-#namespace tld
+from pyOpenTLD.TLD.TLDUtil import *
+
 class detectionResult:
     containsValidData = False
 	fgList = []
@@ -11,12 +12,6 @@ class detectionResult:
     
     def __init__(self):
         pass
-        """
-        self.variances = [0.0]*numWindows
-        self.posteriors = [0.0]*numWindows
-        self.featureVectors = [0.0]*(numWindows*numTrees)
-        self.confidentIndices = []
-        """
         
     def init(self, numWindows, numTrees):
         self.variances = [0.0]*numWindows
@@ -38,4 +33,3 @@ class detectionResult:
         self.featureVectors = None
         self.detectorBB = None
         self.containsValidData = None
-        

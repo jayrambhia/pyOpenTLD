@@ -1,11 +1,11 @@
 import cv2
 from random import random
 from math import floor
+from pyOpenTLD.TLD.detectorCascade import *
+from pyOpenTLD.TLD.ensembleClassifier import *
 
 def sub2idx(x,y,widthstep):
     return (int(floor((x)+0.5) + floor((y)+0.5)*(widthstep)))
-
-#namespace tld
 
 class EnsembleClassifier:
     img = ''
@@ -26,12 +26,7 @@ class EnsembleClassifier:
     
     def __init__(self):
         pass
-        """
-        self.numIndices = pow(2.0,self.numFeatures)
-        self.initFeatureLocations()
-        self.initFeatureOffsets()
-        self.initPosteriors()
-        """
+
     def init(self):
         self.numIndices = pow(2.0,self.numFeatures)
         self.initFeatureLocations()
@@ -134,7 +129,3 @@ class EnsembleClassifier:
         conf = self.calcConfidence(featureVector)
         if (positive and conf < 0.5) or (not positive and conf > 0.5):
             self.updatePosteriors(featureVector, positive, 1)
-        
-            
-    
-    

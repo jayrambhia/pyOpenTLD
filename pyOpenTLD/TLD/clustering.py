@@ -1,5 +1,8 @@
 from math import floor
-#namespace tld
+from pyOpenTLD.TLD.detectorCascade import *
+from pyOpenTLD.TLD.TLDUtil import *
+from pyOpenTLD.TLD.detectionResult import *
+
 class Clustering:
     windows = []
     numWindows = 0
@@ -126,5 +129,3 @@ class Clustering:
                     numClusters -=1
                     
         self.detectionResult.numClusters = numClusters
-                    
-        

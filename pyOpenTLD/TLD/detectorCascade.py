@@ -1,7 +1,15 @@
 from math import floor
+from pyOpenTLD.TLD.clustering import *
+from pyOpenTLD.TLD.detectionResult import *
+from pyOpenTLD.TLD.ensembleClassifier import *
+from pyOpenTLD.TLD.foregroundDetector import *
+from pyOpenTLD.TLD.NNClassifier import *
+from pyOpenTLD.TLD.TLDUtil import *
+from pyOpenTLD.TLD.varianceFilter import *
+
 TLD_WINDOW_SIZE = 5;
 TLD_WINDOW_OFFSET_SIZE = 6
-#namespace tld
+
 class DetectorCascade:
     numScales = 0
     scales = []
@@ -31,35 +39,8 @@ class DetectorCascade:
     detectionResult = DetectionResult()
     
     def __init__(self):
-        """
-        self.objWidth = -1
-        self.objHeight = -1
-        self.useShift = 1
-        self.imgHeight = -1
-        self.imgWidth = -1
-
-        self.shift=0.1
-        self.minScale=-10
-        self.maxScale=10
-        self.minSize = 25
-        self.imgWidthStep = -1
-
-        self.numTrees = 13
-        self.numFeatures = 10
-
-        self.initialised = False
-        """
         pass
-        """
-        self.initWindowsAndScales()
-        self.initWindowOffsets()
-
-        self.propagateMembers()
-
-        self.ensembleClassifier->init();
-
-        self.initialised = True
-        """
+        
     def init(self):
         self.initWindowsAndScales()
         self.initWindowOffsets()

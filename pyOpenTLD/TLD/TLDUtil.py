@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from pyOpenTLD.TLD.detectorCascade import *
+from pyOpenTLD.TLD.NNClassifier import *
 
 def tldRectToPoints(rect):
     p1=(rect[0],rect[1])
@@ -87,9 +89,3 @@ def tldIsInside(bb1, bb2):
 		return 1
 	else: 
         return 0
-    
-    
-    
-    
-    
-            

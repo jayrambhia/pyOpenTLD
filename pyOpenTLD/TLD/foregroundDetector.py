@@ -1,5 +1,6 @@
 import cv2
-#namepace tld
+from pyOpenTLD.TLD.detectionResult import *
+#import BlobResult
 class ForegroundDetector:
     
     fgThreshold = 16
@@ -31,4 +32,3 @@ class ForegroundDetector:
         
     def release(self):
         pass
-        

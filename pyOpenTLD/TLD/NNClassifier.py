@@ -1,4 +1,8 @@
-#namespace tld
+from pyOpenTLD.TLD.clustering import *
+from pyOpenTLD.TLD.detectionResult import *
+from pyOpenTLD.TLD.detectorCascade import *
+from pyOpenTLD.TLD.TLDUtil import *
+
 TLD_PATCH_SIZE = 15
 
 class NNClassifier:
@@ -79,8 +83,7 @@ class NNClassifier:
     def release(self):
         self.truePositives = []
         self.falsePositives = []
-
-#namespace tld        
+      
 class NormalizedPatch:
     values = []
     positive = False
@@ -88,4 +91,3 @@ class NormalizedPatch:
     def __init__(self):
         values = [0.0]*(TLD_PATCH_SIZR,TLD_PATCH_SIZE)
         positive = False
-        
