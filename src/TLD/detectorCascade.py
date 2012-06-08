@@ -23,10 +23,10 @@ class DetectorCascade:
     initialised = False
     
     foregroundDetector = ForegroundDetector()
-	varianceFilter = VarianceFilter()
-	ensembleClassifier = EnsembleClassifier()
-	clustering = Clustering()
-	nnClassifier = NNClassifier()
+    varianceFilter = VarianceFilter()
+    ensembleClassifier = EnsembleClassifier()
+    clustering = Clustering()
+    nnClassifier = NNClassifier()
     
     detectionResult = DetectionResult()
     
@@ -49,6 +49,8 @@ class DetectorCascade:
 
         self.initialised = False
         """
+        pass
+        """
         self.initWindowsAndScales()
         self.initWindowOffsets()
 
@@ -57,9 +59,16 @@ class DetectorCascade:
         self.ensembleClassifier->init();
 
         self.initialised = True
+        """
+    def init(self):
+        self.initWindowsAndScales()
+        self.initWindowOffsets()
+        self.propagateMembers()
+        self.ensembleClassifier.init()
+        self.initialised = True
         
     def propgateMembers(self):
-        #//self.detectionResult->init()
+        self.detectionResult.init(self.numWindows,self.numTrees)
         self.varianceFilter.windowOffsets = self.windowOffsets
         self.ensembleClassifier.windowOffsets = self.windowOffsets
         self.ensembleClassifier.imgWidthStep = self.imgWidthStep
@@ -199,8 +208,3 @@ class DetectorCascade:
         self.objWidth = -1
         self.objHeight = -1
         self.detectionResult.release()
-        
-
-            
-            
-                

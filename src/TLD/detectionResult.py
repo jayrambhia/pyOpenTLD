@@ -9,7 +9,16 @@ class detectionResult:
 	posteriors = None
 	featureVectors = None
     
-    def __init__(self, numWindows, numTrees):
+    def __init__(self):
+        pass
+        """
+        self.variances = [0.0]*numWindows
+        self.posteriors = [0.0]*numWindows
+        self.featureVectors = [0.0]*(numWindows*numTrees)
+        self.confidentIndices = []
+        """
+        
+    def init(self, numWindows, numTrees):
         self.variances = [0.0]*numWindows
         self.posteriors = [0.0]*numWindows
         self.featureVectors = [0.0]*(numWindows*numTrees)

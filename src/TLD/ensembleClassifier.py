@@ -25,6 +25,14 @@ class EnsembleClassifier:
     detectionResult = DetectionResult()
     
     def __init__(self):
+        pass
+        """
+        self.numIndices = pow(2.0,self.numFeatures)
+        self.initFeatureLocations()
+        self.initFeatureOffsets()
+        self.initPosteriors()
+        """
+    def init(self):
         self.numIndices = pow(2.0,self.numFeatures)
         self.initFeatureLocations()
         self.initFeatureOffsets()

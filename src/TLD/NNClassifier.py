@@ -53,9 +53,9 @@ class NNClassifier:
         return distance
         
     def classifyBB(self, img, bb):
-        #//NormalizedPatch patch
+        patch = NormalizedPatch()
         bbox = self.windows[TLD_WINDOW_SIZE*windowIdx:]
-        #//tldExtractNormalizedPatchBB(img, bbox, patch.values)
+        patch.values = tldExtractNormalizedPatchBB(img, bbox)
         return self.classifyPatch(patch)
         
     def filter(self, img, windowIdx):
