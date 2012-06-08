@@ -200,13 +200,3 @@ class TLD:
             patches.append(patch)
             
         self.detectorCascade.nnClassifier.learn(patches)
-            
-                    
-            
-                
-            
-            
-        
-            
-        
-    
