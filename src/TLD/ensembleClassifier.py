@@ -49,14 +49,10 @@ class EnsembleClassifier:
             scale = self.scales[k]
             for i in range(self.numTrees):
                 for j in range(self.numFeatures):
-                    # dafaq
-                    #//float *currentFeature  = features + (4*numFeatures)*i +4*j;
-                    #//*off++ = sub2idx((scale.width-1)*currentFeature[0]+1,(scale.height-1)*currentFeature[1]+1,imgWidthStep); //We add +1 because the index of the bounding box points to x-1, y-1
-                    #//*off++ = sub2idx((scale.width-1)*currentFeature[2]+1,(scale.height-1)*currentFeature[3]+1,imgWidthStep);
                     currentFeature = self.features[4*self.numFeatures*i+4*j:]
                     off.append(sub2idx((scale[0]-1)*currentFeature[0]+1,(scale[1]-1)*currentFeature[1]+1,self.imgWidthStep))
                     off.append(sub2idx((scale[0]-1)*currentFeature[2]+1,(scale[1]-1)*currentFeature[3]+1,self.imgWidthStep))
-        self.featureOffsets[:len(off)-1] = off
+        self.featureOffsets[:len(off)] = off
                     
     def initPosteriors(self):
         self.posteriors = [None]*(self.numTrees*self.numIndices)
