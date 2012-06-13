@@ -1,6 +1,7 @@
 from pyOpenTLD.TLD.detectionResult import *
 from pyOpenTLD.TLD.detectorCascade import *
-#from pyOpenTLD.TLD.integralImage import *
+from pyOpenTLD.TLD.integralImage import *
+
 class VarianceFilter:
     integralImage = []
     integralImage_squared = []
