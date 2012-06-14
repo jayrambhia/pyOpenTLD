@@ -1,15 +1,11 @@
-from pyOpenTLD.TLD.clustering import *
-from pyOpenTLD.TLD.detectionResult import *
-from pyOpenTLD.TLD.detectorCascade import *
-from pyOpenTLD.TLD.TLDUtil import *
-
 TLD_PATCH_SIZE = 15
-
+TLD_WINDOW_SIZE = 15
 class NNClassifier:
     enabled = False
     windows = []
     thetaFP = 0.0
     thetaTP = 0.0
+    from DetectionResult import DetectionResult
     detectionResult = DetectionResult()
     falsePositives = []
     truePositives = []
@@ -38,29 +34,37 @@ class NNClassifier:
         if not self.falsePositives:
             return 0
         
-        corr_maxp = 0
+        ccorr_max_p = 0
         for i in range(len(self.truePositives)):
-            ccorr = ncc(self.truePositives[i].values, patch.values)
+            ccorr = self.ncc(self.truePositives[i].values, patch.values)
             if ccorr > ccorr_max_p:
                 ccorr_max_p = ccorr
         
         ccorr_max_n = 0
         for i in range(len(self.falsePositives)):
-            ccorr = ncc(self.falsePositives[i].values, patch.values)
+            ccorr = self.ncc(self.falsePositives[i].values, patch.values)
             if ccorr > ccorr_max_n:
                 ccorr_max_n = ccorr
         
         dN = 1-ccorr_max_n
         dP = 1-ccorr_max_p
         distance = float(dN)/(dN+dP)
-        
         return distance
-        
+    
     def classifyBB(self, img, bb):
+        from TLDUtil import tldExtractNormalizedPatchRect
+        patch = NormalizedPatch()
+        patch.values = tldExtractNormalizedPatchRect(img, bb)
+        distance = self.classifyPatch(patch)
+        return distance
+    
+    def classifyWindow(self, img, windowIdx):
+        from TLDUtil import tldExtractNormalizedPatchBB
         patch = NormalizedPatch()
         bbox = self.windows[TLD_WINDOW_SIZE*windowIdx:]
         patch.values = tldExtractNormalizedPatchBB(img, bbox)
-        return self.classifyPatch(patch)
+        distance = self.classifyPatch(patch)
+        return distance
         
     def filter(self, img, windowIdx):
         if not self.enabled:
@@ -73,7 +77,7 @@ class NNClassifier:
     def learn(self, patches):
         for i in range(len(patches)):
             patch = patches[i]
-            conf = classifyPatch(patch)
+            conf = self.classifyPatch(patch)
             
             if patch.positive and conf < self.thetaTP:
                 self.truePositives.append(patch)
@@ -89,5 +93,5 @@ class NormalizedPatch:
     positive = False
     
     def __init__(self):
-        values = [0.0]*(TLD_PATCH_SIZR,TLD_PATCH_SIZE)
-        positive = False
+        self.values = [0.0]*(TLD_PATCH_SIZE,TLD_PATCH_SIZE)
+        self.positive = False

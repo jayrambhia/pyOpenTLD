@@ -1,14 +1,12 @@
-from pyOpenTLD.TLD.TLDUtil import *
-
-class detectionResult:
+class DetectionResult:
     containsValidData = False
-	fgList = []
-	confidentIndices = []
-	numClusters = 0
-	detectorBB = None
-	variances = None
-	posteriors = None
-	featureVectors = None
+    fgList = []
+    confidentIndices = []
+    numClusters = 0
+    detectorBB = None
+    variances = None
+    posteriors = None
+    featureVectors = None
     
     def __init__(self):
         pass

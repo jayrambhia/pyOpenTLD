@@ -1,17 +1,18 @@
 import cv2
-from pyOpenTLD.TLD.detectionResult import *
 #import BlobResult
 class ForegroundDetector:
     
     fgThreshold = 16
     minBlobSize = 0
     bgImg = None
+    
+    from DetectionResult import DetectionResult
     detectionResult = DetectionResult()
     
     def __init__(self, fgThreshold=16, minBlobSize=0):
         self.fgThreshold = fgThreshold
         self.minBlobSize = minBlobSize
-        self.bgImg = bgImg
+        #self.bgImg = bgImg
     
     def nextIteration(self, img):
         absImg = cv2.absdiff(self.bgImg, img)
@@ -19,12 +20,14 @@ class ForegroundDetector:
         im = threshImg
         #//blobs = CBlobResult(im, None, 0)
         #//blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, minBlobSize )
+        blobs = None
         fgList = self.detectionResult.fgList
         fgList = []
         
         for i in range(blobs.getNumBlobs()):
             #//blob = blobs.GetBlob(i)
             #//rect = blob.GetBoundingBox()
+            rect = None
             fgList.append(rect)
         
     def isActive(self):

@@ -1,14 +1,9 @@
 from math import floor
-from pyOpenTLD.TLD.clustering import *
-from pyOpenTLD.TLD.detectionResult import *
-from pyOpenTLD.TLD.ensembleClassifier import *
-from pyOpenTLD.TLD.foregroundDetector import *
-from pyOpenTLD.TLD.NNClassifier import *
-from pyOpenTLD.TLD.TLDUtil import *
-from pyOpenTLD.TLD.varianceFilter import *
-
 TLD_WINDOW_SIZE = 5;
 TLD_WINDOW_OFFSET_SIZE = 6
+
+def sub2idx(x,y,widthstep):
+    return (int(floor((x)+0.5) + floor((y)+0.5)*(widthstep)))
 
 class DetectorCascade:
     numScales = 0
@@ -30,12 +25,18 @@ class DetectorCascade:
     windowOffsets = []
     initialised = False
     
+    from Clustering import Clustering
+    from DetectionResult import DetectionResult
+    from EnsembleClassifier import EnsembleClassifier
+    from ForegroundDetector import ForegroundDetector
+    from nNClassifier import NNClassifier, NormalizedPatch
+    from VarianceFilter import VarianceFilter
+    
     foregroundDetector = ForegroundDetector()
     varianceFilter = VarianceFilter()
     ensembleClassifier = EnsembleClassifier()
     clustering = Clustering()
     nnClassifier = NNClassifier()
-    
     detectionResult = DetectionResult()
     
     def __init__(self):
@@ -117,27 +118,28 @@ class DetectorCascade:
                     bb = self.windows[TLD_WINDOW_SIZE*windowIndex:]
                     x, y, w, h = bb[:4]
                     bb[4] = scaleIndex
-                    windowIndex++
+                    windowIndex+=1
                     x+=ssw
                 y+=ssh
         #//assert(windowIndex == numWindows)
         
     def initWindowOffsets(self):
-        self.windowOffsets = [0]*TLD_WINDOW_OFFSET_SIZE*numWindows
+        self.windowOffsets = [0]*TLD_WINDOW_OFFSET_SIZE*self.numWindows
         off = []
         
         windowSize = TLD_WINDOW_SIZE
         for i in range(self.numWindows):
             window = self.windows[windowSize*i:]
-            off.append(sub2idx(window[0]-1,window[1]-1,imgWidthStep))
-            off.append(sub2idx(window[0]-1,window[1]+window[3]-1,imgWidthStep))
-            off.append(sub2idx(window[0]+window[2]-1,window[1]-1,imgWidthStep))
-            off.append(sub2idx(window[0]+window[2]-1,window[1]+window[3]-1,imgWidthStep))
-            off.append(window[4]*2*numFeatures*numTrees)
+            off.append(sub2idx(window[0]-1,window[1]-1,self.imgWidthStep))
+            off.append(sub2idx(window[0]-1,window[1]+window[3]-1,self.imgWidthStep))
+            off.append(sub2idx(window[0]+window[2]-1,window[1]-1,self.imgWidthStep))
+            off.append(sub2idx(window[0]+window[2]-1,window[1]+window[3]-1,self.imgWidthStep))
+            off.append(window[4]*2*self.numFeatures*self.numTrees)
             off.append(window[2]*window[3])
         self.windowOffsets[:len(off)]=off
         
     def detect(self, img):
+        from TLDUtil import tldIsInside
         self.detectionResult.reset()
         if not self.initialised:
             return
@@ -153,7 +155,7 @@ class DetectorCascade:
                 for j in range(len(self.detectionResult.fgList)):
                     bgBox = self.detectionResult.fgList[j:j+4]
                     if tldIsInside(window, bgBox):
-                        inInside = True
+                        isInside = True
                 if not isInside:
                     self.detectionResult.posteriors[i] = 0
                     continue

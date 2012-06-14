@@ -1,8 +1,7 @@
-from pyOpenTLD.TLD.detectionResult import *
-from pyOpenTLD.TLD.detectorCascade import *
-from pyOpenTLD.TLD.integralImage import *
-
+TLD_WINDOW_OFFSET_SIZE = 10
 class VarianceFilter:
+    from DetectionResult import DetectionResult
+    detectionResult = DetectionResult()
     integralImage = []
     integralImage_squared = []
     enabled = False
@@ -23,14 +22,15 @@ class VarianceFilter:
         mX2 = (ii2[off[3]] - ii2[off[2]] - ii2[off[1]] + ii2[off[0]]) / float(off[5])
         return mX2 - mX*mX;
         
-    def nextIteration(img):
+    def nextIteration(self, img):
         if not self.enabled:
             return
+        from IntegralImage import IntegralImage
         self.integralImage = IntegralImage(img.size())
         self.integralImage.calcIntImg(img)
         
         self.integralImage_squared = IntegralImage(img.size())
-        integralImg_squared.calcIntImg(img, True)
+        self.integralImage_squared.calcIntImg(img, True)
         
     def filter(self, i):
         if not self.enabled:
@@ -39,7 +39,7 @@ class VarianceFilter:
         bboxvar = self.calcVariance(self.windowOffsets[TLD_WINDOW_OFFSET_SIZE*i:])
         self.detectionResult.variances[i] = bboxvar;
 
-        if bboxvar < minVar:
+        if bboxvar < self.minVar:
             return False
 
         return True

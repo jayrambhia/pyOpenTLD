@@ -152,7 +152,7 @@ def predictBB(bb0, pt0, pt1, nPts):
     dy = getMedianUnmanaged(ofy)
     ofx=ofy=0
     
-    lenPdist = nPts * (nPts - 1) / 2
+    #lenPdist = nPts * (nPts - 1) / 2
     dist0=[]
     for i in range(nPts):
         for j in range(i+1,nPts):

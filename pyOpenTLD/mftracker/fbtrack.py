@@ -25,7 +25,7 @@ def fbtrack(imgI, imgJ, bb, numM=10, numN=10,margin=5,winsize_ncc=10):
     
     """
     nPoints = numM*numN
-    sizePointsArray = nPoints*2
+    #sizePointsArray = nPoints*2
     
     pt = getFilledBBPoints(bb, numM, numN, margin)
     fb, ncc, status, ptTracked = lktrack(imgI, imgJ, pt, nPoints, winsize_ncc)

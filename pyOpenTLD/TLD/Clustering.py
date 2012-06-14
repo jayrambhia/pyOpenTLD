@@ -1,7 +1,6 @@
 from math import floor
-from pyOpenTLD.TLD.detectorCascade import *
-from pyOpenTLD.TLD.TLDUtil import *
-from pyOpenTLD.TLD.detectionResult import *
+from TLDUtil import *
+from DetectionResult import DetectionResult
 
 class Clustering:
     windows = []
@@ -18,7 +17,7 @@ class Clustering:
         x=y=w=h=0
         numIndices = len(indices)
         for i in range(numIndices):
-            bb = windows[TLD_WINDOW_SIZE*indices[i]:]
+            bb = self.windows[TLD_WINDOW_SIZE*indices[i]:]
             x += bb[0]
             y += bb[1]
             w += bb[2]
@@ -41,7 +40,7 @@ class Clustering:
         for i in range(indices_size):
             firstIndex = confidentIndices[0]
             confidentIndices.pop(0)
-            tldOverlapOne(windows, numWindows, firstIndex, &confidentIndices, distances_tmp)
+            distances_tmp = tldOverlapOne(self.windows, self.numWindows, firstIndex, confidentIndices)
             distances_tmp += indices_size-i-1
             
         for i in range(indices_size*(indices_size-1)/2):
@@ -55,7 +54,7 @@ class Clustering:
         distances = self.calcDistances(distances)
         clusterIndices = [0]*(numConfidentIndices)
         self.cluster(distances, clusterIndices)
-        if(detectionResult->numClusters == 1):
+        if(self.detectionResult.numClusters == 1):
             self.calcMeanRect(self.detectionResult.confidentIndices)
             
     def cluster(self, distances, clusterIndices):
@@ -92,7 +91,7 @@ class Clustering:
             
             distUsed[shortestDistIndex] = 1
             if clusterIndices[i1] == -1 and clusterIndices[i2] == -1:
-                if shortestDist < cutoff:
+                if shortestDist < self.cutoff:
                     clusterIndices[i1] = clusterIndices[i2] = newClusterIndex
                     newClusterIndex+=1
                     numClusters+=1
@@ -105,7 +104,7 @@ class Clustering:
                     numClusters+=1
             
             elif clusterIndices[i1] == -1 and clusterIndices[i2] != -1:
-                if shortestDist < cutoff:
+                if shortestDist < self.cutoff:
                     clusterIndices[i1] = clusterIndices[i2]
                 else:
                     clusterIndices[i1] = newClusterIndex
@@ -113,7 +112,7 @@ class Clustering:
                     numClusters+=1
             
             elif clusterIndices[i1] != -1 and clusterIndices[i2] == -1:
-                if shortestDist < cutoff:
+                if shortestDist < self.cutoff:
                     clusterIndices[i2] = clusterIndices[i1]
                 else:
                     clusterIndices[i2] = newClusterIndex
@@ -121,7 +120,7 @@ class Clustering:
                     numClusters+=1
             
             else:
-                if clusterIndices[i1] != clusterIndices[i2] && shortestDist < cutoff:
+                if clusterIndices[i1] != clusterIndices[i2] and shortestDist < self.cutoff:
                     oldClusterIndex = clusterIndices[i2]
                     for i in range(numConfidentIndices):
                         if clusterIndices[i] == oldClusterIndex:

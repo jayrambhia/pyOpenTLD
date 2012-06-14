@@ -1,18 +1,20 @@
 __version__ = "0.1"
-
-from pyOpenTLD import *
-
-from pyOpenTLD.mftracker.bb import *
-from pyOpenTLD.mftracker.lk import *
-from pyOpenTLD.mftracker.fbtrack import *
-from pyOpenTLD.mftracker.median import *
-from pyOpenTLD.TLD.clustering import *
-from pyOpenTLD.TLD.detectorCascade import *
-from pyOpenTLD.TLD.ensembleClassifier import *
-from pyOpenTLD.TLD.foregroundDetector import *
-from pyOpenTLD.TLD.medianFlowTracker import *
-from pyOpenTLD.TLD.NNClassifier import *
-from pyOpenTLD.TLD.TLD import *
-from pyOpenTLD.TLD.TLDUtil import *
-from pyOpenTLD.TLD.varianceFilter import *
-
+"""
+from pyOpenTLD.mftracker import bb
+from pyOpenTLD.mftracker import lk
+from pyOpenTLD.mftracker import fbtrack
+from pyOpenTLD.mftracker import median
+"""
+from mftracker import *
+from TLD import *
+"""
+from pyOpenTLD.TLD import Clustering
+from pyOpenTLD.TLD import DetectorCascade
+from pyOpenTLD.TLD import EnsembleClassifier
+from pyOpenTLD.TLD import ForegroundDetector
+from pyOpenTLD.TLD import MedianFlowTracker
+from pyOpenTLD.TLD import NNClassifier
+from pyOpenTLD.TLD import TLD
+from pyOpenTLD.TLD import TLDUtil
+from pyOpenTLD.TLD import VarianceFilter
+"""

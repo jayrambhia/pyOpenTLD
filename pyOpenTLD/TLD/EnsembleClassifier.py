@@ -1,8 +1,7 @@
 import cv2
 from random import random
 from math import floor
-from pyOpenTLD.TLD.detectorCascade import *
-from pyOpenTLD.TLD.ensembleClassifier import *
+TLD_WINDOW_OFFSET_SIZE = 10
 
 def sub2idx(x,y,widthstep):
     return (int(floor((x)+0.5) + floor((y)+0.5)*(widthstep)))
@@ -22,6 +21,8 @@ class EnsembleClassifier:
     posteriors = []
     positives = []
     negatives = []
+    
+    from DetectionResult import DetectionResult
     detectionResult = DetectionResult()
     
     def __init__(self):
@@ -41,7 +42,7 @@ class EnsembleClassifier:
         self.negatives = None
         
     def initFeatureLocations(self):
-        size = 2 * 2 * numFeatures * numTrees
+        size = 2 * 2 * self.numFeatures * self.numTrees
         self.features = []
         for i in range(size):
             self.features.append(random())
@@ -74,11 +75,11 @@ class EnsembleClassifier:
     def calcFernFeature(self, windowIdx, treeIdx):
         index = 0
         bbox = self.windowOffsets[windowIdx+TLD_WINDOW_OFFSET_SIZE:]
-        off = self.featureOffsets[bbox[4]+treeIdx*2*numFeatures:]
+        off = self.featureOffsets[bbox[4]+treeIdx*2*self.numFeatures:]
         for i in range(self.numFeatures):
             index <<= 1
-            fp0 = img[bbox[0]+off[0]]
-            fp1 = img[bbox[0]+off[1]]
+            fp0 = self.img[bbox[0]+off[0]]
+            fp1 = self.img[bbox[0]+off[1]]
             if fp0 > fp1:
                 index |= 1
             off = off[2:]
@@ -93,7 +94,7 @@ class EnsembleClassifier:
     def calcConfidence(self, featureVector):
         conf = 0.0
         for i in range(self.numTrees):
-            conf += posteriors[i * numIndices + featureVector[i]]
+            conf += self.posteriors[i * self.numIndices + featureVector[i]]
         return conf
         
     def classifyWindow(self, windowIdx):
@@ -110,15 +111,15 @@ class EnsembleClassifier:
         return True
         
     def updatePosterior(self, treeIdx, idx, positive, amount):
-        index = treeIdx * numIndices + idx
+        index = treeIdx * self.numIndices + idx
         if positive:
             self.positives[index] += amount
         else:
             self.negatives[index] += amount
             
-        self.posteriors[index] = float(positives[index]) / (positives[index] + negatives[index]) / 10.0
+        self.posteriors[index] = float(self.positives[index]) / (self.positives[index] + self.negatives[index]) / 10.0
         
-    def updatePosterior(self, featureVector, positive, amount):
+    def updatePosteriors(self, featureVector, positive, amount):
         for i in range(self.numTrees):
             idx = featureVector[i]
             self.updatePosterior(i, idx, positive, amount)
