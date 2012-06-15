@@ -29,7 +29,7 @@ class EnsembleClassifier:
         pass
 
     def init(self):
-        self.numIndices = pow(2.0,self.numFeatures)
+        self.numIndices = int(pow(2.0,self.numFeatures))
         self.initFeatureLocations()
         self.initFeatureOffsets()
         self.initPosteriors()

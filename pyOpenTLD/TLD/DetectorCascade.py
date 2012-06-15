@@ -49,7 +49,7 @@ class DetectorCascade:
         self.ensembleClassifier.init()
         self.initialised = True
         
-    def propgateMembers(self):
+    def propagateMembers(self):
         self.detectionResult.init(self.numWindows,self.numTrees)
         self.varianceFilter.windowOffsets = self.windowOffsets
         self.ensembleClassifier.windowOffsets = self.windowOffsets
@@ -99,7 +99,7 @@ class DetectorCascade:
             numWindows += floor(float(self.scanAreaW - w + ssw)/ssw)*floor(float(self.scanAreaH - h + ssh) / ssh)
             
         self.numScales = scaleIndex
-        self.windows = [0]*(TLD_WINDOW_SIZE*numWindows)
+        self.windows = [0]*(TLD_WINDOW_SIZE*self.numWindows)
         
         for scaleIndex in range(self.numScales):
             w = self.scales[scaleIndex][0]
@@ -121,7 +121,7 @@ class DetectorCascade:
                     windowIndex+=1
                     x+=ssw
                 y+=ssh
-        #//assert(windowIndex == numWindows)
+        assert(windowIndex == self.numWindows)
         
     def initWindowOffsets(self):
         self.windowOffsets = [0]*TLD_WINDOW_OFFSET_SIZE*self.numWindows

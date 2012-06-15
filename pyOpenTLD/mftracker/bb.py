@@ -180,5 +180,5 @@ def getBB(pt0,pt1):
     return xmin,ymin,xmax,ymax
     
 def getRectFromBB(bb):
-    return bb[0],bb[1],bb[0]-bb[2],bb[1]-bb[3]
+    return bb[0],bb[1],bb[2]-bb[0],bb[3]-bb[1]
     

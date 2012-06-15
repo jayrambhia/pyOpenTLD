@@ -1,4 +1,5 @@
 TLD_WINDOW_OFFSET_SIZE = 10
+
 class VarianceFilter:
     from DetectionResult import DetectionResult
     detectionResult = DetectionResult()

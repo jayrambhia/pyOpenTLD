@@ -1,12 +1,12 @@
-class IntergralImage:
+class IntegralImage:
     data = []
     width = 0
     height = 0
     
-    def __init__(size):
+    def __init__(self, size):
         self.data = [0.0]*(size[0]*size[1])
         
-    def calcIntImage(img, squared=False):
+    def calcIntImg(self, img, squared=False):
         output = self.data
         ip = img.data
         for i in range(img.height):
