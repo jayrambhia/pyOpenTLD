@@ -34,7 +34,7 @@ def tldBoundaryToRect(boundary):
     return [boundary[0],boundary[1],boundary[2],boundary[3]]
     
 def tldExtractSubImage(img, boundary):
-    return img[boundary]
+    return img.crop(boundary[0],boundary[1],boundary[2],boundary[3])
 
 def tldExtractNormalizedPatch(img, x, y, w, h):
     subImage = tldExtractSubImage(img, (x,y,w,h))
@@ -42,25 +42,27 @@ def tldExtractNormalizedPatch(img, x, y, w, h):
 
 def tldNormalizeImg(subimg):
     size = TLD_PATCH_SIZE;
-    result = cv2.resize(subimg,(size,size))
+    #result = cv2.resize(subimg,(size,size))
+    result = subimg.resize(size,size)
     mean = 0.0
 
-    imgData = result.data
+    imgData = result.getGrayNumpy().flat
+    result = result.getMatrix()
+    print "result.step",
+    print result.step
+    print len(imgData)
 
     for i in range(15):
         for j in range(15):
-            mean += imgData[j*result.step+ i]
+            mean += imgData[j*size+ i]
     mean /= size*size
 
     output = [0.0]*(size*15+16)
 
     for i in range(size):
         for j in range(size):
-            output[j*15+i] = imgData[j*result.step + i] - mean
-            
-def tldExtractSubImage(img, rect):
-    subimg = img(rect)
-    return subimg
+            output[j*15+i] = imgData[j*size + i] - mean
+    return output
 
 def tldExtractNormalizedPatchBB(img, boundary):
     x,y,w,h = tldExtractDimsFromArray(boundary)

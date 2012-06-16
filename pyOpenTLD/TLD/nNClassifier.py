@@ -93,5 +93,5 @@ class NormalizedPatch:
     positive = False
     
     def __init__(self):
-        self.values = [0.0]*(TLD_PATCH_SIZE,TLD_PATCH_SIZE)
+        self.values = [0.0]*(TLD_PATCH_SIZE*TLD_PATCH_SIZE)
         self.positive = False

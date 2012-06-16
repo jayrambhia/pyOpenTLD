@@ -5,7 +5,7 @@ import time
 import numpy as np
 import scipy.spatial.distance as spsd
 
-def lktrack(img1, img2, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM_CCOEFF_NORMED):
+def lktrack(imgI, imgJ, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM_CCOEFF_NORMED):
     """
     **SUMMARY**
     
@@ -43,6 +43,9 @@ def lktrack(img1, img2, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM
     template_pt = np.asarray(template_pt,dtype="float32")
     target_pt = np.asarray(target_pt,dtype="float32")
     fb_pt = np.asarray(fb_pt,dtype="float32")
+    
+    img1 = imgI.getGrayNumpy()
+    img2 = imgJ.getGrayNumpy()
     
     target_pt, status, track_error = calcOpticalFlowPyrLK(img1, img2, template_pt, target_pt, 
                                      winSize=(win_size_lk, win_size_lk), flags = OPTFLOW_USE_INITIAL_FLOW,

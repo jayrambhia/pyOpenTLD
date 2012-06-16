@@ -128,3 +128,7 @@ class Clustering:
                     numClusters -=1
                     
         self.detectionResult.numClusters = numClusters
+    
+    def release(self):
+        self.windows = None
+        self.numWindows = 0

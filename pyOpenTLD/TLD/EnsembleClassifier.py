@@ -35,12 +35,14 @@ class EnsembleClassifier:
         self.initPosteriors()
         
     def release(self):
+        pass
+        """
         self.features = None
         self.featureOffsets = None
         self.posteriors = None
         self.positives = None
         self.negatives = None
-        
+        """
     def initFeatureLocations(self):
         size = 2 * 2 * self.numFeatures * self.numTrees
         self.features = []
@@ -70,7 +72,8 @@ class EnsembleClassifier:
                 self.negatives[i*self.numIndices+j]=0
                 
     def nextIteration(self,img):
-        self.img = img.data
+        #self.img = img.data
+        pass
         
     def calcFernFeature(self, windowIdx, treeIdx):
         index = 0

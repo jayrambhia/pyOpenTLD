@@ -56,11 +56,11 @@ class TLD:
         self.valid = True
         self.initialLearning()
         
-    def ProcessImage(self, img):
+    def processImage(self, img):
         self.storeCurrentData()
         #//cvtColor( img,grey_frame, CV_RGB2GRAY );
         #//currImg = grey_frame; // Store new image , right after storeCurrentData();
-        grey_frame=None
+        grey_frame = img.toGray()
         self.currImg = grey_frame
         if self.trackEnabled:
             self.medianFlowTracker.track(self.prevImg, self.currImg, self.prevBB)
