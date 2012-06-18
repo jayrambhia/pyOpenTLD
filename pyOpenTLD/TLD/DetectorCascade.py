@@ -1,4 +1,5 @@
 from math import floor
+import time
 TLD_WINDOW_SIZE = 5;
 TLD_WINDOW_OFFSET_SIZE = 6
 
@@ -18,8 +19,8 @@ class DetectorCascade:
     imgWidth = -1
     imgHeight = -1
     imgWidthStep = -1
-    objWidth = -1
-    objHeight = -1
+    objWidth = 1
+    objHeight = 1
     numWindows = 0
     windows = []
     windowOffsets = []
@@ -73,34 +74,45 @@ class DetectorCascade:
     def initWindowsAndScales(self):
         scanAreaX = 1
         scanAreaY = 1
+        
         scanAreaW = self.imgWidth-1
         scanAreaH = self.imgHeight-1
         scaleIndex = 0
         windowIndex = 0
-        self.scales = [(0,0)]*(self.maxScale-self.minScale+1)
+        self.scales = [[0,0]]*(self.maxScale-self.minScale+1)
         self.numWindows = 0
         
         for i in range(self.minScale,self.maxScale+1):
             scale = pow(1.2,i)
-            w = self.objWidth*scale
-            h = self.objHeight*scale
+            print scale,
+            print "scale"
+            w = int(self.objWidth*scale)
+            h = int(self.objHeight*scale)
             if self.useShift:
                 ssw = max(1,w*self.shift)
                 ssh = max(1,h*self.shift)
             else:
                 ssw = 1
                 ssh = 1
-            
-            if w < self.minSize or h < self.minSize or w > self.scanAreaW or h > self.scanAreaH: 
+            if w < self.minSize or h < self.minSize or w > scanAreaW or h > scanAreaH: 
                 continue
             self.scales[scaleIndex][0] = w
             self.scales[scaleIndex][1] = h
+            print w,h,
+            print "w","h"
             scaleIndex+=1
-            numWindows += floor(float(self.scanAreaW - w + ssw)/ssw)*floor(float(self.scanAreaH - h + ssh) / ssh)
-            
+            self.numWindows += floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
+            self.numWindows = int(self.numWindows)
+            print floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
+        print "self.numWindows",
+        print self.numWindows
+        print "scaleIndex",
+        print scaleIndex
         self.numScales = scaleIndex
         self.windows = [0]*(TLD_WINDOW_SIZE*self.numWindows)
-        
+        print "list made"
+        print self.numScales,
+        print "self.numScales"
         for scaleIndex in range(self.numScales):
             w = self.scales[scaleIndex][0]
             h = self.scales[scaleIndex][1]
@@ -110,26 +122,40 @@ class DetectorCascade:
             else:
                 ssw = 1
                 ssh = 1
-            
+            print ssw,ssh,
+            print "ssw","ssh"
             y = scanAreaY
             while y + h <= scanAreaY +scanAreaH:
                 x = scanAreaX
                 while x + w <= scanAreaX + scanAreaW:
-                    bb = self.windows[TLD_WINDOW_SIZE*windowIndex:]
-                    x, y, w, h = bb[:4]
-                    bb[4] = scaleIndex
+                    # damn it. I need to change self.windows here. :X
+                    index = TLD_WINDOW_SIZE*windowIndex
+                    self.windows[index:index+5] = x, y, w, h
                     windowIndex+=1
                     x+=ssw
+                    #print x,
+                    #print "x"
                 y+=ssh
-        assert(windowIndex == self.numWindows)
+                #print y,
+                #print "y"
+        print "initWindowandScales end"
+        #assert(windowIndex == self.numWindows)
         
     def initWindowOffsets(self):
+#        self.numWindows = 100
+        print "initWindowOffsets start"
         self.windowOffsets = [0]*TLD_WINDOW_OFFSET_SIZE*self.numWindows
         off = []
         
         windowSize = TLD_WINDOW_SIZE
-        for i in range(self.numWindows):
-            window = self.windows[windowSize*i:]
+        print self.numWindows,
+        print "self.numWindows"
+        t1 = time.time()
+        for i in xrange(self.numWindows):
+            index = windowSize*i
+            window = self.windows[index:index+5]
+            if len(window) < 5:
+                continue
             off.append(sub2idx(window[0]-1,window[1]-1,self.imgWidthStep))
             off.append(sub2idx(window[0]-1,window[1]+window[3]-1,self.imgWidthStep))
             off.append(sub2idx(window[0]+window[2]-1,window[1]-1,self.imgWidthStep))
@@ -137,6 +163,10 @@ class DetectorCascade:
             off.append(window[4]*2*self.numFeatures*self.numTrees)
             off.append(window[2]*window[3])
         self.windowOffsets[:len(off)]=off
+        t2 = time.time()
+        print i
+        print t2-t1,
+        print "time taken"
         
     def detect(self, img):
         from TLDUtil import tldIsInside
@@ -148,14 +178,19 @@ class DetectorCascade:
         self.ensembleClassifier.nextIteration(img)
         
         #multiprocessing stuff .. what ??
-        for i in range(self.numWindows):
-            window = self.windows[TLD_WINDOW_SIZE*i:]
+        for i in xrange(self.numWindows):
+            index = TLD_WINDOW_SIZE*i
+            window = self.windows[index:index+4]
+            if len(window) < 4:
+                break
             if self.foregroundDetector.isActive():
                 inInside = False
                 for j in range(len(self.detectionResult.fgList)):
                     bgBox = self.detectionResult.fgList[j:j+4]
                     if tldIsInside(window, bgBox):
                         isInside = True
+                    else:
+                        isInside = False
                 if not isInside:
                     self.detectionResult.posteriors[i] = 0
                     continue
@@ -188,6 +223,6 @@ class DetectorCascade:
         self.scales = []
         self.windows = []
         self.windowOffsets = []
-        self.objWidth = -1
-        self.objHeight = -1
+        self.objWidth = 1
+        self.objHeight = 1
         self.detectionResult.release()

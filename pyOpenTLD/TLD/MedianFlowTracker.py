@@ -13,8 +13,11 @@ class MedianFlowTracker:
             if prevBB[2] <= 0 or prevBB[3] <= 0 :
                 return
             bb_tracker = [prevBB[0], prevBB[1], prevBB[0]+prevBB[2]-1, prevBB[1]+prevBB[3]-1]
-        
+            print bb_tracker,
+            print "bb_tracker"
             bb_tracker, shift = fbtrack(prevImg, currImg, bb_tracker)
+            print bb_tracker,
+            print "bb_tracker"
             
             x = floor(bb_tracker[0]+0.5)
             y = floor(bb_tracker[1]+0.5)

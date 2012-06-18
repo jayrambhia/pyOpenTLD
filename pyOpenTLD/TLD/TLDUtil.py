@@ -83,15 +83,23 @@ def tldCalcVariance(value):
     return np.array(value).std()
     
 def tldBBOverlap(bb1, bb2):
+    #print bb1
+    #print bb2
+    #if not bb2:
+     #   bb2 = [0]*4
+    #print "tldBBOverlap",
     if bb1[0] > bb2[0]+bb2[2] or bb1[1] > bb2[1]+bb2[3] or bb1[0]+bb1[2] < bb2[0] or bb1[1]+bb1[3] < bb2[1]:
+        #print 0.0
         return 0.0
 
-    colInt =  min(bb1[0]+bb1[2], bb2[0]+bb2[2]) - max(bb1[0], bb2[0]);
-    rowInt =  min(bb1[1]+bb1[3], bb2[1]+bb2[3]) - max(bb1[1], bb2[1]);
+    colInt =  min(bb1[0]+bb1[2], bb2[0]+bb2[2]) - max(bb1[0], bb2[0])
+    rowInt =  min(bb1[1]+bb1[3], bb2[1]+bb2[3]) - max(bb1[1], bb2[1])
 
-    intersection = colInt * rowInt;
-    area1 = bb1[2]*bb1[3];
-    area2 = bb2[2]*bb2[3];
+    intersection = colInt * rowInt
+    area1 = bb1[2]*bb1[3]
+    area2 = bb2[2]*bb2[3]
+    #print intersection / float(area1 + area2 - intersection)
+    #print "tldBBoverlap"
     return intersection / float(area1 + area2 - intersection)
 
 def tldOverlapOne(windows, numWindows, index, indices):
@@ -111,8 +119,12 @@ def tldOverlapRect(windows, numWindows, boundary):
 
 def tldOverlap(windows, numWindows, boundary):
     overlap = []
-    for i in range(numWindows):
-        overlap.append(tldBBOverlap(boundary, windows[TLD_WINDOW_SIZE*i:]))
+    for i in xrange(numWindows):
+        index = TLD_WINDOW_SIZE*i
+        bb = windows[index:index+4]
+        if len(bb) < 4:
+            continue
+        overlap.append(tldBBOverlap(boundary, bb))
     return overlap
     
 def tldSortByOverlapDesc(bb1 , bb2):

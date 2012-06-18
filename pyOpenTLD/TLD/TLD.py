@@ -3,10 +3,10 @@ from random import shuffle
 from TLDUtil import *
 
 class TLD:
-    trackEnabled = False
-    detectorEnabled = False
-    learningEnabled = False
-    alternating = False
+    trackEnabled = True
+    detectorEnabled = True
+    learningEnabled = True
+    alternating = True
     
     from DetectorCascade import DetectorCascade
     from MedianFlowTracker import MedianFlowTracker
@@ -15,8 +15,8 @@ class TLD:
     detectorCascade = DetectorCascade()
     nnClassifier = NNClassifier()
     
-    valid = False
-    wasValid = False
+    valid = True
+    wasValid = True
     prevImg = None
     currImg = None
     prevBB = None
@@ -30,9 +30,9 @@ class TLD:
         self.detectorEnabled = True
         self.learningEnabled = True
         self.alternating = False
-        self.valid = False
-        self.wasValid = False
-        self.learning = False
+        self.valid = True
+        self.wasValid = True
+        self.learning = True
         self.currBB = None
         
         self.nnClassifier = self.detectorCascade.nnClassifier
@@ -46,8 +46,8 @@ class TLD:
         
     def selectObject(self, img, bb):
         self.detectorCascade.release()
-        self.detectorCascade.width = bb[2]
-        self.detectorCascade.height = bb[3]
+        self.detectorCascade.objWidth = bb[2]
+        self.detectorCascade.objHeight = bb[3]
         self.detectorCascade.init()
         
         self.currImg = img
@@ -72,13 +72,17 @@ class TLD:
         self.learn()
         
     def fuseHypotheses(self):
+        print "fuseHypotheses"
         trackerBB = self.medianFlowTracker.trackerBB
+        print trackerBB
         numClusters = self.detectorCascade.detectionResult.numClusters
+        print numClusters
         detectorBB = self.detectorCascade.detectionResult.detectorBB
+        print detectorBB
         
         self.currBB = None
         self.currConf = 0
-        self.valid = False
+        self.valid = True
         
         confDetector = 0
         
@@ -102,7 +106,9 @@ class TLD:
         elif numClusters == 1:
             self.currBB = detectorBB
             self.currConf = confDetector
-            
+        print self.currConf
+        print self.currBB
+                
     def initialLearning(self):
         self.learning = True
         self.detectionResult = self.detectorCascade.detectionResult
@@ -119,8 +125,9 @@ class TLD:
         
         positiveIndices = []
         negativeIndices = []
-        
-        for i in range(self.detectorCascade.numWindows):
+        print len(overlap)
+        print self.detectorCascade.numWindows
+        for i in xrange(len(overlap)):
             if overlap[i] > 0.6:
                 positiveIndices.append((i,overlap[i]))
             if overlap[i] < 0.2:
@@ -151,8 +158,10 @@ class TLD:
         self.detectorCascade.nnClassifier.learn(patches)
         
     def learn(self):
+        print self.learningEnabled, self.valid, self.detectorEnabled
         if not self.learningEnabled or not self.valid or not self.detectorEnabled:
             self.learning = False
+            print "not learning"
             return
         self.learning = True
         
@@ -162,13 +171,18 @@ class TLD:
         
         patch = NormalizedPatch()
         patch.values = tldExtractNormalizedPatchRect(self.currImg, self.currBB)
+        #print patch.values
+        print "self.detectorCascade.numWindows",
+        print self.detectorCascade.numWindows
         overlap = tldOverlapRect(self.detectorCascade.windows, self.detectorCascade.numWindows, self.currBB)
+        #print overlap,
+        #print "overlap"
         
         positiveIndices = []
         negativeIndices = []
         negativeIndicesForNN = []
         
-        for i in range(self.detectorCascade.numWindows):
+        for i in xrange(len(overlap)):
             if overlap[i] > 0.6:
                 positiveIndices.append([i,overlap[i]])
             if overlap[i] < 0.2:

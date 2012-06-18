@@ -35,14 +35,12 @@ class EnsembleClassifier:
         self.initPosteriors()
         
     def release(self):
-        pass
-        """
-        self.features = None
-        self.featureOffsets = None
-        self.posteriors = None
-        self.positives = None
-        self.negatives = None
-        """
+        self.features = []
+        self.featureOffsets = []
+        self.posteriors = []
+        self.positives = []
+        self.negatives = []
+        
     def initFeatureLocations(self):
         size = 2 * 2 * self.numFeatures * self.numTrees
         self.features = []
