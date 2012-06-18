@@ -16,9 +16,16 @@ class VarianceFilter:
         self.integralImage_squared = None
         
     def calcVariance(self, off):
+        print len(off)
+        print off
         ii1 = self.integralImage.data
         ii2 = self.integralImage_squared.data
-        
+        print len(ii1)
+        print len(ii2)
+        for i in xrange(len(off)):
+            if off[i] > len(ii1):
+                off[i] = 0
+        print off
         mX  = (ii1[off[3]] - ii1[off[2]] - ii1[off[1]] + ii1[off[0]]) / float(off[5])
         mX2 = (ii2[off[3]] - ii2[off[2]] - ii2[off[1]] + ii2[off[0]]) / float(off[5])
         return mX2 - mX*mX;
@@ -36,8 +43,8 @@ class VarianceFilter:
     def filter(self, i):
         if not self.enabled:
             return True
-
-        bboxvar = self.calcVariance(self.windowOffsets[TLD_WINDOW_OFFSET_SIZE*i:])
+        index = TLD_WINDOW_OFFSET_SIZE*i
+        bboxvar = self.calcVariance(self.windowOffsets[index:index+6])
         self.detectionResult.variances[i] = bboxvar;
 
         if bboxvar < self.minVar:

@@ -188,7 +188,9 @@ class DetectorCascade:
             if len(window) < 4:
                 break
             if self.foregroundDetector.isActive():
-                inInside = False
+                print "foregroundDetector Active"
+                isInside = False
+                print "inInside False"
                 for j in range(len(self.detectionResult.fgList)):
                     bgBox = self.detectionResult.fgList[j:j+4]
                     if tldIsInside(window, bgBox):

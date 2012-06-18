@@ -17,17 +17,10 @@ class ForegroundDetector:
         self.minBlobSize = minBlobSize
     
     def nextIteration(self, img):
-        #print img
-        #img.show()
-        #time.sleep(1)
-        #absImg = img
-        #threshImg = cv2.threshold(absImg,self.fgThreshold,255,cv2.THRESH_BINARY)
-        #print self.fgThreshold
+        if not self.bgImg:
+            return
         threshImg = img.threshold(self.fgThreshold)
-        #threshImg.show()
-        #//blobs = CBlobResult(im, None, 0)
         blobs = threshImg.findBlobs()
-        #//blobs.Filter( blobs, B_EXCLUDE, CBlobGetArea(), B_LESS, minBlobSize )
         fgList = self.detectionResult.fgList
         
         for blob in blobs:
@@ -36,7 +29,7 @@ class ForegroundDetector:
         self.detectionResult.fgList = fgList
         
     def isActive(self):
-        return (not self.bgImg)
+        return (self.bgImg)
         
     def release(self):
         pass

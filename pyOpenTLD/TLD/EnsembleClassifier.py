@@ -70,15 +70,19 @@ class EnsembleClassifier:
                 self.negatives[i*self.numIndices+j]=0
                 
     def nextIteration(self,img):
-        #self.img = img.data
+        self.img = img.getGrayNumpy().flat
         pass
         
     def calcFernFeature(self, windowIdx, treeIdx):
         index = 0
         bbox = self.windowOffsets[windowIdx+TLD_WINDOW_OFFSET_SIZE:]
+        print bbox[0]
+        print bbox[4]
         off = self.featureOffsets[bbox[4]+treeIdx*2*self.numFeatures:]
         for i in range(self.numFeatures):
             index <<= 1
+            print bbox[0]
+            print off[0]
             fp0 = self.img[bbox[0]+off[0]]
             fp1 = self.img[bbox[0]+off[1]]
             if fp0 > fp1:
