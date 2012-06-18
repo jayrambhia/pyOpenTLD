@@ -73,6 +73,7 @@ def tldExtractDimsFromArray(boundary):
     return boundary[0],boundary[1],boundary[2],boundary[3]
 
 def tldExtractNormalizedPatchRect(img, rect):
+    print rect
     output = tldExtractNormalizedPatch(img, rect[0],rect[1],rect[2],rect[3])
     return output
     
@@ -83,13 +84,7 @@ def tldCalcVariance(value):
     return np.array(value).std()
     
 def tldBBOverlap(bb1, bb2):
-    #print bb1
-    #print bb2
-    #if not bb2:
-     #   bb2 = [0]*4
-    #print "tldBBOverlap",
     if bb1[0] > bb2[0]+bb2[2] or bb1[1] > bb2[1]+bb2[3] or bb1[0]+bb1[2] < bb2[0] or bb1[1]+bb1[3] < bb2[1]:
-        #print 0.0
         return 0.0
 
     colInt =  min(bb1[0]+bb1[2], bb2[0]+bb2[2]) - max(bb1[0], bb2[0])
@@ -98,8 +93,6 @@ def tldBBOverlap(bb1, bb2):
     intersection = colInt * rowInt
     area1 = bb1[2]*bb1[3]
     area2 = bb2[2]*bb2[3]
-    #print intersection / float(area1 + area2 - intersection)
-    #print "tldBBoverlap"
     return intersection / float(area1 + area2 - intersection)
 
 def tldOverlapOne(windows, numWindows, index, indices):

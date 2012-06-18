@@ -6,7 +6,7 @@ class TLD:
     trackEnabled = True
     detectorEnabled = True
     learningEnabled = True
-    alternating = True
+    alternating = False
     
     from DetectorCascade import DetectorCascade
     from MedianFlowTracker import MedianFlowTracker
@@ -15,8 +15,8 @@ class TLD:
     detectorCascade = DetectorCascade()
     nnClassifier = NNClassifier()
     
-    valid = True
-    wasValid = True
+    valid = False
+    wasValid = False
     prevImg = None
     currImg = None
     prevBB = None
@@ -26,6 +26,8 @@ class TLD:
     learning = False
     
     def __init__(self):
+        #pass
+        """
         self.trackEnabled = True
         self.detectorEnabled = True
         self.learningEnabled = True
@@ -34,7 +36,7 @@ class TLD:
         self.wasValid = True
         self.learning = True
         self.currBB = None
-        
+        """
         self.nnClassifier = self.detectorCascade.nnClassifier
         
     def storeCurrentData(self):
@@ -45,6 +47,7 @@ class TLD:
         self.wasValid = self.valid
         
     def selectObject(self, img, bb):
+        print("TLD select object\n")
         self.detectorCascade.release()
         self.detectorCascade.objWidth = bb[2]
         self.detectorCascade.objHeight = bb[3]
@@ -58,14 +61,13 @@ class TLD:
         
     def processImage(self, img):
         self.storeCurrentData()
-        #//cvtColor( img,grey_frame, CV_RGB2GRAY );
-        #//currImg = grey_frame; // Store new image , right after storeCurrentData();
         grey_frame = img.toGray()
         self.currImg = grey_frame
         if self.trackEnabled:
             self.medianFlowTracker.track(self.prevImg, self.currImg, self.prevBB)
-            
-        if self.detectorEnabled and (not self.alternating or self.medianFlowTracker.trackerBB == None):
+            if self.medianFlowTracker.trackerBB:
+                self.detectorCascade.detectionResult.detectorBB = self.medianFlowTracker.trackerBB
+        if self.detectorEnabled and (not self.alternating or not self.medianFlowTracker.trackerBB):
             self.detectorCascade.detect(grey_frame)
             
         self.fuseHypotheses()
@@ -82,7 +84,7 @@ class TLD:
         
         self.currBB = None
         self.currConf = 0
-        self.valid = True
+        self.valid = False
         
         confDetector = 0
         
@@ -106,6 +108,7 @@ class TLD:
         elif numClusters == 1:
             self.currBB = detectorBB
             self.currConf = confDetector
+        
         print self.currConf
         print self.currBB
                 

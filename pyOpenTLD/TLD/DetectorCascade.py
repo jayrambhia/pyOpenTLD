@@ -44,6 +44,7 @@ class DetectorCascade:
         pass
         
     def init(self):
+        print "DetectorCascade init"
         self.initWindowsAndScales()
         self.initWindowOffsets()
         self.propagateMembers()
@@ -169,15 +170,18 @@ class DetectorCascade:
         print "time taken"
         
     def detect(self, img):
+        print "DetctorCascade detect"
         from TLDUtil import tldIsInside
         self.detectionResult.reset()
         if not self.initialised:
+            print "self.initialised false"
             return
         self.foregroundDetector.nextIteration(img)
         self.varianceFilter.nextIteration(img)
         self.ensembleClassifier.nextIteration(img)
         
         #multiprocessing stuff .. what ??
+        print "detecting"
         for i in xrange(self.numWindows):
             index = TLD_WINDOW_SIZE*i
             window = self.windows[index:index+4]

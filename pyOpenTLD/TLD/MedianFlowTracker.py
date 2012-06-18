@@ -25,6 +25,8 @@ class MedianFlowTracker:
             h = floor(bb_tracker[3]-bb_tracker[1]+1+0.5)
             
             if x<0 or y<0 or w<=0 or h<=0 or x +w > currImg.width or y+h > currImg.height or not x or not y or not w or not h:
+                print x,y,w,h
+                print "self.trackerBB None"
                 pass
             else:
                 self.trackerBB = [x,y,w,h]

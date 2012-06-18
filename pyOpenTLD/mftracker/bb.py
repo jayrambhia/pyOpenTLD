@@ -165,11 +165,14 @@ def predictBB(bb0, pt0, pt1, nPts):
     s0 = 0.5 * (shift - 1) * getBBWidth(bb0)
     s1 = 0.5 * (shift - 1) * getBBHeight(bb0)
     
-    bb1 = (abs(bb0[0] + s0 + dx),
-           abs(bb0[1] + s1 + dy),
-           abs(bb0[2] + s0 + dx), 
-           abs(bb0[3] + s1 + dy))
-              
+    print s0,s1
+    print shift
+    bb1 = (bb0[0] - s0 + dx,
+           bb0[1] - s1 + dy,
+           bb0[2] + s0 + dx,
+           bb0[3] + s1 + dy)
+    print bb1,
+    print "BB1"
     return (bb1, shift)
     
 def getBB(pt0,pt1):

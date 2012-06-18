@@ -1,23 +1,11 @@
-from SimpleCV import Image, Camera, Display
+from SimpleCV import Image, Camera, Display, VirtualCamera
 from pyOpenTLD import *
-'''
-from pyOpenTLD.mftracker.bb import *
-from pyOpenTLD.mftracker.lk import *
-from pyOpenTLD.mftracker.fbtrack import *
-from pyOpenTLD.mftracker.median import *
-from pyOpenTLD.TLD.clustering import *
-from pyOpenTLD.TLD.detectorCascade import *
-from pyOpenTLD.TLD.ensembleClassifier import *
-from pyOpenTLD.TLD.foregroundDetector import *
-from pyOpenTLD.TLD.medianFlowTracker import *
-from pyOpenTLD.TLD.NNClassifier import *
-from pyOpenTLD.TLD.TLD import *
-from pyOpenTLD.TLD.TLDUtil import *
-from pyOpenTLD.TLD.varianceFilter import *
-'''
+
 class PyOpenTLD:
     tld = TLD()
     display = Display()
+#    cam = VirtualCamera("inputcar.avi","video")
+    cam=Camera()
     threshold = 0
     initialBB = []
     
@@ -25,23 +13,64 @@ class PyOpenTLD:
         self.threshold = 0.5
         self.initialBB = []
         
-    def start_tld(self):
-        img = getImage()
-        grey = img.toGray()
+    def start_tld(self, bb=None):
+        img = self.cam.getImage()
+        grey = img.toGray().getBitmap()
         
         self.tld.detectorCascade.imgWidth = grey.width
         self.tld.detectorCascade.imgHeight = grey.height
-        self.tld.detectorCascade.imgWidthStep = grey.widthStep
-        
-        bb = getBBFromUser()
+        self.tld.detectorCascade.imgWidthStep = grey.width*grey.nChannels
+        if not bb:
+            bb = getBBFromUser(self.cam, self.display)
+        print bb
+        grey = img.toGray()
+        img.drawRectangle(bb[0],bb[1],bb[2],bb[3],width=5)
+        img.show()
         self.tld.selectObject(grey, bb)
         skipProcessingOnce = True
         reuseFrameOnce = True
+        self.process_open()
         
+    def process_open(self):
+        img = self.cam.getImage()
         self.tld.processImage(img)
         if self.tld.currBB:
-            img.drawBB(self.tld.currBB)
+            print self.tld.currBB
+            x,y,w,h = self.tld.currBB
+            img.drawRectangle(x,y,w,h,width=5)
+        img.show()
+        self.process_open()
 
-PyOpenTLD()
+def getBBFromUser(cam, d):
+    p1 = None
+    p2 = None
+    #img = cam.getImage()
+    while d.isNotDone():
+        try:
+            img = cam.getImage()
+            a=img.save(d)
+            dwn = d.leftButtonDownPosition()
+            up = d.leftButtonUpPosition()
+            
+            if dwn:
+                p1 = dwn
+            if up:
+                p2 = up
+                break
+
+            time.sleep(0.1)
+        except KeyboardInterrupt:
+            break
+    if not p1 or not p2:
+        return None
+    
+    bb = getBB(p1,p2)
+    print p1,p2
+    print bb
+    rect = getRectFromBB(bb)
+    return rect
+
+p=PyOpenTLD()
+p.start_tld()
         
     
