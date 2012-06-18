@@ -85,8 +85,8 @@ class DetectorCascade:
         
         for i in range(self.minScale,self.maxScale+1):
             scale = pow(1.2,i)
-            print scale,
-            print "scale"
+            #print scale,
+            #print "scale"
             w = int(self.objWidth*scale)
             h = int(self.objHeight*scale)
             if self.useShift:
@@ -99,12 +99,12 @@ class DetectorCascade:
                 continue
             self.scales[scaleIndex][0] = w
             self.scales[scaleIndex][1] = h
-            print w,h,
-            print "w","h"
+            #print w,h,
+            #print "w","h"
             scaleIndex+=1
             self.numWindows += floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
             self.numWindows = int(self.numWindows)
-            print floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
+            #print floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
         print "self.numWindows",
         print self.numWindows
         print "scaleIndex",
@@ -123,8 +123,8 @@ class DetectorCascade:
             else:
                 ssw = 1
                 ssh = 1
-            print ssw,ssh,
-            print "ssw","ssh"
+            #print ssw,ssh,
+            #print "ssw","ssh"
             y = scanAreaY
             while y + h <= scanAreaY +scanAreaH:
                 x = scanAreaX
@@ -165,7 +165,7 @@ class DetectorCascade:
             off.append(window[2]*window[3])
         self.windowOffsets[:len(off)]=off
         t2 = time.time()
-        print i
+        #print i
         print t2-t1,
         print "time taken"
         

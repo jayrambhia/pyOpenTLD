@@ -1,7 +1,7 @@
 import cv2
 from random import random
 from math import floor
-TLD_WINDOW_OFFSET_SIZE = 10
+TLD_WINDOW_OFFSET_SIZE = 6
 
 def sub2idx(x,y,widthstep):
     return (int(floor((x)+0.5) + floor((y)+0.5)*(widthstep)))
@@ -70,24 +70,26 @@ class EnsembleClassifier:
                 self.negatives[i*self.numIndices+j]=0
                 
     def nextIteration(self,img):
-        self.img = img.getGrayNumpy().flat
-        pass
+        self.img = img.getNumpy().flat
         
     def calcFernFeature(self, windowIdx, treeIdx):
         index = 0
         bbox = self.windowOffsets[windowIdx+TLD_WINDOW_OFFSET_SIZE:]
-        print bbox[0]
-        print bbox[4]
+        #print bbox[0]
+        #print bbox[4]
         off = self.featureOffsets[bbox[4]+treeIdx*2*self.numFeatures:]
         for i in range(self.numFeatures):
+            if not off:
+                break
             index <<= 1
-            print bbox[0]
-            print off[0]
+         #   print bbox[0]
+          #  print off[0]
             fp0 = self.img[bbox[0]+off[0]]
             fp1 = self.img[bbox[0]+off[1]]
             if fp0 > fp1:
                 index |= 1
             off = off[2:]
+        
         return index
         
     def calcFeatureVector(self, windowIdx):

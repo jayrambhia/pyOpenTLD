@@ -78,7 +78,7 @@ class TLD:
         trackerBB = self.medianFlowTracker.trackerBB
         print trackerBB
         numClusters = self.detectorCascade.detectionResult.numClusters
-        print numClusters
+        #print numClusters
         detectorBB = self.detectorCascade.detectionResult.detectorBB
         print detectorBB
         
@@ -109,7 +109,8 @@ class TLD:
             self.currBB = detectorBB
             self.currConf = confDetector
         
-        print self.currConf
+        print self.currConf,
+        print "Current Confidence"
         print self.currBB
                 
     def initialLearning(self):
@@ -128,8 +129,8 @@ class TLD:
         
         positiveIndices = []
         negativeIndices = []
-        print len(overlap)
-        print self.detectorCascade.numWindows
+        #print len(overlap)
+        #print self.detectorCascade.numWindows
         for i in xrange(len(overlap)):
             if overlap[i] > 0.6:
                 positiveIndices.append((i,overlap[i]))

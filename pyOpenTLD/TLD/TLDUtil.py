@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from nNClassifier import NormalizedPatch
 
-TLD_WINDOW_SIZE = 15
+TLD_WINDOW_SIZE = 5
 TLD_PATCH_SIZE = 15
 
 def tldRectToPoints(rect):
@@ -46,11 +46,11 @@ def tldNormalizeImg(subimg):
     result = subimg.resize(size,size)
     mean = 0.0
 
-    imgData = result.getGrayNumpy().flat
+    imgData = result.getNumpy().flat
     result = result.getMatrix()
-    print "result.step",
-    print result.step
-    print len(imgData)
+    #print "result.step",
+    #print result.step
+    #print len(imgData)
 
     for i in range(15):
         for j in range(15):
@@ -73,7 +73,7 @@ def tldExtractDimsFromArray(boundary):
     return boundary[0],boundary[1],boundary[2],boundary[3]
 
 def tldExtractNormalizedPatchRect(img, rect):
-    print rect
+    #print rect
     output = tldExtractNormalizedPatch(img, rect[0],rect[1],rect[2],rect[3])
     return output
     

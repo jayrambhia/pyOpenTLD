@@ -1,4 +1,4 @@
-TLD_WINDOW_OFFSET_SIZE = 10
+TLD_WINDOW_OFFSET_SIZE = 6
 
 class VarianceFilter:
     from DetectionResult import DetectionResult
@@ -16,18 +16,21 @@ class VarianceFilter:
         self.integralImage_squared = None
         
     def calcVariance(self, off):
-        print len(off)
-        print off
+        #print len(off)
+        #print off
         ii1 = self.integralImage.data
         ii2 = self.integralImage_squared.data
-        print len(ii1)
-        print len(ii2)
+        #print len(ii1)
+        #print len(ii2)
         for i in xrange(len(off)):
             if off[i] > len(ii1):
                 off[i] = 0
-        print off
-        mX  = (ii1[off[3]] - ii1[off[2]] - ii1[off[1]] + ii1[off[0]]) / float(off[5])
-        mX2 = (ii2[off[3]] - ii2[off[2]] - ii2[off[1]] + ii2[off[0]]) / float(off[5])
+        #print off
+        try:
+            mX  = (ii1[off[3]] - ii1[off[2]] - ii1[off[1]] + ii1[off[0]]) / float(off[5])
+            mX2 = (ii2[off[3]] - ii2[off[2]] - ii2[off[1]] + ii2[off[0]]) / float(off[5])
+        except ZeroDivisionError, IndexError:
+            return 0.0
         return mX2 - mX*mX;
         
     def nextIteration(self, img):

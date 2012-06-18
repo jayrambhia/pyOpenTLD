@@ -6,19 +6,19 @@ class IntegralImage:
     
     def __init__(self, size):
         self.size = size 
-        self.data = [0.0]*(size[0]*size[1])
+        self.data = [0.0]*(size[0]*size[1]*3)
         
     def calcIntImg(self, img, squared=False):
-        ip = img.getGrayNumpy().flat
+        ip = img.getNumpy().flat
         op = self.data
         matrix = img.getMatrix()
         cols = matrix.cols
         rows = matrix.rows
         step = img.getMatrix().step
-        print step*rows+cols
-        print len(ip)
-        for i in xrange(cols/3):
-            for j in xrange(rows/3):
+        #print step*rows+cols
+        #print len(ip)
+        for i in xrange(cols):
+            for j in xrange(rows):
                 A = 0
                 B = 0
                 C = 0
