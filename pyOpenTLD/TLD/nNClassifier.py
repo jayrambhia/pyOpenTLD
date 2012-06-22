@@ -21,7 +21,7 @@ class NNClassifier:
         
         size = TLD_PATCH_SIZE*TLD_PATCH_SIZE
         
-        for i in range(size):
+        for i in xrange(size):
             corr += f1[i]*f2[i]
             norm1 += f1[i]*f1[i]
             norm2 += f2[i]*f2[i]
@@ -35,13 +35,13 @@ class NNClassifier:
             return 0
         
         ccorr_max_p = 0
-        for i in range(len(self.truePositives)):
+        for i in xrange(len(self.truePositives)):
             ccorr = self.ncc(self.truePositives[i].values, patch.values)
             if ccorr > ccorr_max_p:
                 ccorr_max_p = ccorr
         
         ccorr_max_n = 0
-        for i in range(len(self.falsePositives)):
+        for i in xrange(len(self.falsePositives)):
             ccorr = self.ncc(self.falsePositives[i].values, patch.values)
             if ccorr > ccorr_max_n:
                 ccorr_max_n = ccorr
@@ -75,7 +75,7 @@ class NNClassifier:
         return True
         
     def learn(self, patches):
-        for i in range(len(patches)):
+        for i in xrange(len(patches)):
             patch = patches[i]
             conf = self.classifyPatch(patch)
             

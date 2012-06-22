@@ -9,5 +9,6 @@ setup(name="pyOpenTLD",
     author_email = "jayrambhia777@gmail.com",
     license = 'BSD',
     packages = find_packages(),
-    requires = ["cv2","cv","simplecv"]
+    requires = ["cv2","cv","simplecv"],
+    scripts = ["scripts/opentld"]
     )

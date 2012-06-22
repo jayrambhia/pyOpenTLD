@@ -44,15 +44,15 @@ class EnsembleClassifier:
     def initFeatureLocations(self):
         size = 2 * 2 * self.numFeatures * self.numTrees
         self.features = []
-        for i in range(size):
+        for i in xrange(size):
             self.features.append(random())
             
     def initFeatureOffsets(self):
         off = []
-        for k in range(self.numScales):
+        for k in xrange(self.numScales):
             scale = self.scales[k]
-            for i in range(self.numTrees):
-                for j in range(self.numFeatures):
+            for i in xrange(self.numTrees):
+                for j in xrange(self.numFeatures):
                     currentFeature = self.features[4*self.numFeatures*i+4*j:]
                     off.append(sub2idx((scale[0]-1)*currentFeature[0]+1,(scale[1]-1)*currentFeature[1]+1,self.imgWidthStep))
                     off.append(sub2idx((scale[0]-1)*currentFeature[2]+1,(scale[1]-1)*currentFeature[3]+1,self.imgWidthStep))
@@ -63,8 +63,8 @@ class EnsembleClassifier:
         self.positives = [None]*(self.numTrees*self.numIndices)
         self.negatives = [None]*(self.numTrees*self.numIndices)
         
-        for i in range(self.numTrees):
-            for j in range(self.numIndices):
+        for i in xrange(self.numTrees):
+            for j in xrange(self.numIndices):
                 self.posteriors[i*self.numIndices+j]=0
                 self.positives[i*self.numIndices+j]=0
                 self.negatives[i*self.numIndices+j]=0
@@ -77,30 +77,34 @@ class EnsembleClassifier:
         bbox = self.windowOffsets[windowIdx+TLD_WINDOW_OFFSET_SIZE:]
         #print bbox[0]
         #print bbox[4]
-        off = self.featureOffsets[bbox[4]+treeIdx*2*self.numFeatures:]
-        for i in range(self.numFeatures):
+        featureOffsets = self.featureOffsets[bbox[4]+treeIdx*2*self.numFeatures:]
+        for i in xrange(self.numFeatures):
+            off = featureOffsets[2*i:2*(i+1)]
             if not off:
                 break
             index <<= 1
          #   print bbox[0]
           #  print off[0]
-            fp0 = self.img[bbox[0]+off[0]]
-            fp1 = self.img[bbox[0]+off[1]]
+            try:
+                fp0 = self.img[bbox[0]+off[0]]
+                fp1 = self.img[bbox[0]+off[1]]
+            except IndexError:
+                continue
             if fp0 > fp1:
                 index |= 1
-            off = off[2:]
+            #off = off[2:]
         
         return index
         
     def calcFeatureVector(self, windowIdx):
         featureVector = []
-        for i in range(self.numTrees):
+        for i in xrange(self.numTrees):
             featureVector.append(self.calcFernFeature(windowIdx, i))
         return featureVector
         
     def calcConfidence(self, featureVector):
         conf = 0.0
-        for i in range(self.numTrees):
+        for i in xrange(self.numTrees):
             conf += self.posteriors[i * self.numIndices + featureVector[i]]
         return conf
         
@@ -127,7 +131,7 @@ class EnsembleClassifier:
         self.posteriors[index] = float(self.positives[index]) / (self.positives[index] + self.negatives[index]) / 10.0
         
     def updatePosteriors(self, featureVector, positive, amount):
-        for i in range(self.numTrees):
+        for i in xrange(self.numTrees):
             idx = featureVector[i]
             self.updatePosterior(i, idx, positive, amount)
     

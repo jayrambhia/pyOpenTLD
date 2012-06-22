@@ -68,10 +68,10 @@ def lktrack(imgI, imgJ, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM
             ptsJ[2 * i] = target_pt[i][0]
             ptsJ[2 * i + 1] = target_pt[i][1]
         else:
-            ptsJ[2 * i] = None
-            ptsJ[2 * i + 1] = None
-            fb[i] = None
-            ncc[i] = None
+            ptsJ[2 * i] = -1
+            ptsJ[2 * i + 1] = -1
+            fb[i] = -1
+            ncc[i] = -1
             
     return fb, ncc, status, ptsJ
     

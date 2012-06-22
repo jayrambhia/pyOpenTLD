@@ -14,7 +14,7 @@ class PyOpenTLD:
         self.initialBB = []
         
     def start_tld(self, bb=None):
-        img = self.cam.getImage()
+        img = self.cam.getImage().scale(160,100)
         grey = img.toGray().getBitmap()
         
         self.tld.detectorCascade.imgWidth = grey.width
@@ -32,7 +32,7 @@ class PyOpenTLD:
         self.process_open()
         
     def process_open(self):
-        img = self.cam.getImage()
+        img = self.cam.getImage().scale(160,100)
         self.tld.processImage(img)
         if self.tld.currBB:
             print self.tld.currBB
@@ -47,7 +47,7 @@ def getBBFromUser(cam, d):
     #img = cam.getImage()
     while d.isNotDone():
         try:
-            img = cam.getImage()
+            img = cam.getImage().scale(160,100)
             a=img.save(d)
             dwn = d.leftButtonDownPosition()
             up = d.leftButtonUpPosition()

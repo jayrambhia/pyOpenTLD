@@ -1,4 +1,5 @@
 from math import floor
+from multiprocessing import Pool
 import time
 TLD_WINDOW_SIZE = 5;
 TLD_WINDOW_OFFSET_SIZE = 6
@@ -83,7 +84,7 @@ class DetectorCascade:
         self.scales = [[0,0]]*(self.maxScale-self.minScale+1)
         self.numWindows = 0
         
-        for i in range(self.minScale,self.maxScale+1):
+        for i in xrange(self.minScale,self.maxScale+1):
             scale = pow(1.2,i)
             #print scale,
             #print "scale"
@@ -114,7 +115,7 @@ class DetectorCascade:
         print "list made"
         print self.numScales,
         print "self.numScales"
-        for scaleIndex in range(self.numScales):
+        for scaleIndex in xrange(self.numScales):
             w = self.scales[scaleIndex][0]
             h = self.scales[scaleIndex][1]
             if self.useShift:
@@ -179,6 +180,9 @@ class DetectorCascade:
         self.foregroundDetector.nextIteration(img)
         self.varianceFilter.nextIteration(img)
         self.ensembleClassifier.nextIteration(img)
+        #pool = Pool(processes=4)
+        #ranges = xrange(self.numWindows)
+        #result = pool.map(self.detecting,ranges)
         
         #multiprocessing stuff .. what ??
         print "detecting"
@@ -191,7 +195,7 @@ class DetectorCascade:
                 print "foregroundDetector Active"
                 isInside = False
                 print "inInside False"
-                for j in range(len(self.detectionResult.fgList)):
+                for j in xrange(len(self.detectionResult.fgList)):
                     bgBox = self.detectionResult.fgList[j:j+4]
                     if tldIsInside(window, bgBox):
                         isInside = True
@@ -212,7 +216,44 @@ class DetectorCascade:
         
         self.clustering.clusterConfidentIndices()
         self.detectionResult.containsValidData = True
+    """
+    def detecting(self, i):
+        #multiprocessing stuff .. what ??
+        print "detecting"
+        index = TLD_WINDOW_SIZE*i
+        window = self.windows[index:index+4]
+        if len(window) < 4:
+            pass
+        if self.foregroundDetector.isActive():
+            print "foregroundDetector Active"
+            isInside = False
+            print "inInside False"
+            for j in xrange(len(self.detectionResult.fgList)):
+                bgBox = self.detectionResult.fgList[j:j+4]
+                if tldIsInside(window, bgBox):
+                    isInside = True
+                else:
+                    isInside = False
+            if not isInside:
+                self.detectionResult.posteriors[i] = 0
+                #continue
+                pass
+        if not self.varianceFilter.filter(i):
+            self.detectionResult.posteriors[i] = 0
+            #continue
+            pass
+        if not self.ensembleClassifier.filter(i):
+            #continue
+            pass
+        if not self.nnClassifier.filter(img,i):
+            #continue
+            pass
+            
+        self.detectionResult.confidentIndices.append(i)
         
+        #self.clustering.clusterConfidentIndices()
+        #self.detectionResult.containsValidData = True
+    """
     def cleanPreviousData(self):
         self.detectionResult.reset()
         

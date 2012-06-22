@@ -145,7 +145,7 @@ class TLD:
         patches.append(patch)
         
         numIterations = min(len(positiveIndices), 10)
-        for i in range(numIterations):
+        for i in xrange(numIterations):
             idx = positiveIndices[i][0]
             self.detectorCascade.ensembleClassifier.learn(self.currImg, 
                          self.detectorCascade.windows[TLD_WINDOW_SIZE*idx:], 
@@ -153,7 +153,7 @@ class TLD:
                          self.detectionResult.featureVectors[self.detectorCascade.numTrees*idx:])
         
         shuffle(negativeIndices)
-        for i in range(min(100,len(negativeIndices))):
+        for i in xrange(min(100,len(negativeIndices))):
             idx = negativeIndices[i]
             patch = NormalizedPatch()
             patch.values = tldExtractNormalizedPatchBB(self.currImg, self.detectorCascade.windows[TLD_WINDOW_SIZE*idx:])
@@ -202,21 +202,21 @@ class TLD:
         
         numIterations = min(len(positiveIndices), 10)
         
-        for i in range(len(negativeIndices)):
+        for i in xrange(len(negativeIndices)):
             idx = negativeIndices[i]
             self.detectorCascade.ensembleClassifier.learn(self.currImg, 
                             self.detectorCascade.windows[TLD_WINDOW_SIZE*idx:],
                             False, 
                             self.detectionResult.featureVectors[self.detectorCascade.numTrees*idx:])
         
-        for i in range(numIterations):
+        for i in xrange(numIterations):
             idx = positiveIndices[i][0]
             self.detectorCascade.ensembleClassifier.learn(self.currImg,
                             self.detectorCascade.windows[TLD_WINDOW_SIZE*idx:],
                             True,
                             self.detectionResult.featureVectors[self.detectorCascade.numTrees*idx:])
                             
-        for i in range(len(negativeIndicesForNN)):
+        for i in xrange(len(negativeIndicesForNN)):
             idx = negativeIndiceForNN[i]
             patch = NormalizedPatch()
             patch.values = tldExtractNormalizedPatchBB(self.currImg, self.detectorCascade.windows[TLD_WINDOW_SIZE*idx:])

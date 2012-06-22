@@ -19,14 +19,14 @@ def tldNormalizedImage(img):
     mean = 0
     imgData = result.toString
     output = [0]*((size-1)*15+size+1)
-    for i in range(15):
-        for j in range(15):
+    for i in xrange(15):
+        for j in xrange(15):
             mean += imgData[j*result.step+ i]
             
     mean /= float(size*size)
     
-    for i in range(size):
-        for j in range(size):
+    for i in xrange(size):
+        for j in xrange(size):
             output[j*15+i] = imgData[j*result.step + i] - mean
     return output
     
@@ -52,15 +52,15 @@ def tldNormalizeImg(subimg):
     #print result.step
     #print len(imgData)
 
-    for i in range(15):
-        for j in range(15):
+    for i in xrange(15):
+        for j in xrange(15):
             mean += imgData[j*size+ i]
     mean /= size*size
 
     output = [0.0]*(size*15+16)
 
-    for i in range(size):
-        for j in range(size):
+    for i in xrange(size):
+        for j in xrange(size):
             output[j*15+i] = imgData[j*size + i] - mean
     return output
 
@@ -97,7 +97,7 @@ def tldBBOverlap(bb1, bb2):
 
 def tldOverlapOne(windows, numWindows, index, indices):
     overlap = []
-    for i in range(len(indices)):
+    for i in xrange(len(indices)):
         overlap.append(tldBBOverlap(windows[TLD_WINDOW_SIZE*index:], windows[TLD_WINDOW_SIZE*indices[i]:]))
     return overlap
 

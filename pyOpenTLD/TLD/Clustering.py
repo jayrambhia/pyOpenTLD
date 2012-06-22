@@ -16,7 +16,7 @@ class Clustering:
     def calcMeantRect(self, indices):
         x=y=w=h=0
         numIndices = len(indices)
-        for i in range(numIndices):
+        for i in xrange(numIndices):
             bb = self.windows[TLD_WINDOW_SIZE*indices[i]:]
             x += bb[0]
             y += bb[1]
@@ -37,13 +37,13 @@ class Clustering:
     def calcDistances(self, distances):
         confidentIndices = self.detectionResult.confidentIndices
         indices_size = len(confidentIndices)
-        for i in range(indices_size):
+        for i in xrange(indices_size):
             firstIndex = confidentIndices[0]
             confidentIndices.pop(0)
             distances_tmp = tldOverlapOne(self.windows, self.numWindows, firstIndex, confidentIndices)
             distances_tmp += indices_size-i-1
             
-        for i in range(indices_size*(indices_size-1)/2):
+        for i in xrange(indices_size*(indices_size-1)/2):
             distances[i] = 1-distances[i]
             
         return distances
@@ -76,8 +76,8 @@ class Clustering:
             shortestDist = -1
             shortestDistIndex = -1
             distIndex = 0
-            for i in range(numConfidentIndices):
-                for j in range(i+1,numConfidentIndices):
+            for i in xrange(numConfidentIndices):
+                for j in xrange(i+1,numConfidentIndices):
                     if(not distUsed[distIndex] and (shortestDistIndex == -1 or distances[distIndex] < shortestDist)):
                         shortestDist = distances[distIndex]
                         shortestDistIndex = distIndex
@@ -122,7 +122,7 @@ class Clustering:
             else:
                 if clusterIndices[i1] != clusterIndices[i2] and shortestDist < self.cutoff:
                     oldClusterIndex = clusterIndices[i2]
-                    for i in range(numConfidentIndices):
+                    for i in xrange(numConfidentIndices):
                         if clusterIndices[i] == oldClusterIndex:
                             clusterIndices[i] = clusterIndices[i1]
                     numClusters -=1
