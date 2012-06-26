@@ -13,15 +13,3 @@ Help appreciated.
     Numpy
     Scipy
     Pygame
-
-### HOW TO:
-
-### Install:
-
-    git clone git://github.com/jayrambhia/pyOpenTLD.git
-    cd pyOpenTLD
-    sudo python setup.py install
-    
-### Run:
-
-    $ opentld

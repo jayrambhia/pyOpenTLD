@@ -59,20 +59,15 @@ class EnsembleClassifier:
         self.featureOffsets[:len(off)] = off
                     
     def initPosteriors(self):
-        self.posteriors = [None]*(self.numTrees*self.numIndices)
-        self.positives = [None]*(self.numTrees*self.numIndices)
-        self.negatives = [None]*(self.numTrees*self.numIndices)
-        
-        for i in xrange(self.numTrees):
-            for j in xrange(self.numIndices):
-                self.posteriors[i*self.numIndices+j]=0
-                self.positives[i*self.numIndices+j]=0
-                self.negatives[i*self.numIndices+j]=0
+        self.posteriors = [0]*(self.numTrees*self.numIndices)
+        self.positives = [0]*(self.numTrees*self.numIndices)
+        self.negatives = [0]*(self.numTrees*self.numIndices)
                 
     def nextIteration(self,img):
         self.img = img.getNumpy().flat
         
     def calcFernFeature(self, windowIdx, treeIdx):
+        #print "calcFernFeature"
         index = 0
         bbox = self.windowOffsets[windowIdx+TLD_WINDOW_OFFSET_SIZE:]
         #print bbox[0]
@@ -80,6 +75,7 @@ class EnsembleClassifier:
         featureOffsets = self.featureOffsets[bbox[4]+treeIdx*2*self.numFeatures:]
         for i in xrange(self.numFeatures):
             off = featureOffsets[2*i:2*(i+1)]
+            #print off
             if not off:
                 break
             index <<= 1
@@ -88,12 +84,14 @@ class EnsembleClassifier:
             try:
                 fp0 = self.img[bbox[0]+off[0]]
                 fp1 = self.img[bbox[0]+off[1]]
+                #print fp0,fp1
             except IndexError:
                 continue
             if fp0 > fp1:
                 index |= 1
             #off = off[2:]
-        
+        #print index
+        #raw_input("index?")
         return index
         
     def calcFeatureVector(self, windowIdx):
@@ -106,22 +104,28 @@ class EnsembleClassifier:
         conf = 0.0
         for i in xrange(self.numTrees):
             conf += self.posteriors[i * self.numIndices + featureVector[i]]
+        #print "conf",
+        #print conf
         return conf
         
     def classifyWindow(self, windowIdx):
+        #print "classifyWindow",
         #featureVector = self.detectionResult.featureVectors[self.numTrees*windowIdx:]
         featureVector = self.calcFeatureVector(windowIdx)
         self.detectionResult.posteriors[windowIdx] = self.calcConfidence(featureVector)
+        #print self.calcConfidence(featureVector)
         
     def filter(self, i):
         if not self.enabled:
             return True
         self.classifyWindow(i)
+        #print self.detectionResult.posteriors[i]
         if(self.detectionResult.posteriors[i] < 0.5):
             return False
         return True
         
     def updatePosterior(self, treeIdx, idx, positive, amount):
+        #print "updatePosterior"
         index = treeIdx * self.numIndices + idx
         if positive:
             self.positives[index] += amount
@@ -136,6 +140,8 @@ class EnsembleClassifier:
             self.updatePosterior(i, idx, positive, amount)
     
     def learn(self, img, boundary, positive, featureVector):
+        #print "ensembleclassifier learn"
+        #raw_input()
         if not self.enabled:
             return 
         conf = self.calcConfidence(featureVector)

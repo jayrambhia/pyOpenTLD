@@ -53,6 +53,7 @@ class DetectorCascade:
         self.initialised = True
         
     def propagateMembers(self):
+        print "propogateMembers"
         self.detectionResult.init(self.numWindows,self.numTrees)
         self.varianceFilter.windowOffsets = self.windowOffsets
         self.ensembleClassifier.windowOffsets = self.windowOffsets
@@ -72,6 +73,15 @@ class DetectorCascade:
         self.ensembleClassifier.detectionResult = self.detectionResult
         self.nnClassifier.detectionResult = self.detectionResult
         self.clustering.detectionResult = self.detectionResult
+        
+        print id(self.foregroundDetector.detectionResult)
+        print id(self.detectionResult)
+        print id(self.varianceFilter.detectionResult)
+        print id(self.ensembleClassifier.detectionResult)
+        print id(self.nnClassifier.detectionResult)
+        print id(self.clustering.detectionResult)
+        
+        #raw_input("propogate members:")
     
     def initWindowsAndScales(self):
         scanAreaX = 1
@@ -86,8 +96,6 @@ class DetectorCascade:
         
         for i in xrange(self.minScale,self.maxScale+1):
             scale = pow(1.2,i)
-            #print scale,
-            #print "scale"
             w = int(self.objWidth*scale)
             h = int(self.objHeight*scale)
             if self.useShift:
@@ -100,12 +108,9 @@ class DetectorCascade:
                 continue
             self.scales[scaleIndex][0] = w
             self.scales[scaleIndex][1] = h
-            #print w,h,
-            #print "w","h"
             scaleIndex+=1
             self.numWindows += floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
             self.numWindows = int(self.numWindows)
-            #print floor(float(scanAreaW - w + ssw)/ssw)*floor(float(scanAreaH - h + ssh) / ssh)
         print "self.numWindows",
         print self.numWindows
         print "scaleIndex",
@@ -124,27 +129,19 @@ class DetectorCascade:
             else:
                 ssw = 1
                 ssh = 1
-            #print ssw,ssh,
-            #print "ssw","ssh"
             y = scanAreaY
             while y + h <= scanAreaY +scanAreaH:
                 x = scanAreaX
                 while x + w <= scanAreaX + scanAreaW:
-                    # damn it. I need to change self.windows here. :X
                     index = TLD_WINDOW_SIZE*windowIndex
                     self.windows[index:index+5] = x, y, w, h
                     windowIndex+=1
                     x+=ssw
-                    #print x,
-                    #print "x"
                 y+=ssh
-                #print y,
-                #print "y"
         print "initWindowandScales end"
         #assert(windowIndex == self.numWindows)
         
     def initWindowOffsets(self):
-#        self.numWindows = 100
         print "initWindowOffsets start"
         self.windowOffsets = [0]*TLD_WINDOW_OFFSET_SIZE*self.numWindows
         off = []
@@ -167,11 +164,19 @@ class DetectorCascade:
         self.windowOffsets[:len(off)]=off
         t2 = time.time()
         #print i
-        print t2-t1,
-        print "time taken"
+        #print t2-t1,
+        #print "time taken"
         
     def detect(self, img):
         print "DetctorCascade detect"
+        '''
+        print id(self.foregroundDetector.detectionResult.posteriors)
+        print id(self.detectionResult.posteriors)
+        print id(self.varianceFilter.detectionResult.posteriors)
+        print id(self.ensembleClassifier.detectionResult.posteriors)
+        print id(self.nnClassifier.detectionResult.posteriors)
+        print id(self.clustering.detectionResult.posteriors)
+        '''
         from TLDUtil import tldIsInside
         self.detectionResult.reset()
         if not self.initialised:
@@ -180,22 +185,25 @@ class DetectorCascade:
         self.foregroundDetector.nextIteration(img)
         self.varianceFilter.nextIteration(img)
         self.ensembleClassifier.nextIteration(img)
-        #pool = Pool(processes=4)
-        #ranges = xrange(self.numWindows)
-        #result = pool.map(self.detecting,ranges)
         
         #multiprocessing stuff .. what ??
         print "detecting"
+        print self.numWindows
         for i in xrange(self.numWindows):
+            self.ensembleClassifier.detectionResult = self.detectionResult
+            self.clustering.detectionResult = self.detectionResult
+            self.varianceFilter.detectionResult = self.detectionResult
             index = TLD_WINDOW_SIZE*i
             window = self.windows[index:index+4]
             if len(window) < 4:
                 break
             if self.foregroundDetector.isActive():
-                print "foregroundDetector Active"
+                #print "foregroundDetector Active"
                 isInside = False
-                print "inInside False"
+                #print "inInside False"
                 for j in xrange(len(self.detectionResult.fgList)):
+                    print self.detectionResult.fgList[j:j+4],
+                    print fgList
                     bgBox = self.detectionResult.fgList[j:j+4]
                     if tldIsInside(window, bgBox):
                         isInside = True
@@ -205,55 +213,30 @@ class DetectorCascade:
                     self.detectionResult.posteriors[i] = 0
                     continue
             if not self.varianceFilter.filter(i):
+                #print "not self.varianceFilter"
                 self.detectionResult.posteriors[i] = 0
                 continue
             if not self.ensembleClassifier.filter(i):
+                #print "not self.ensembleClassifier"
                 continue
             if not self.nnClassifier.filter(img,i):
+                #print "not self.nnClassifier"
                 continue
             
             self.detectionResult.confidentIndices.append(i)
-        
+        self.clustering.detectionResult = self.detectionResult
+        #print "self.clustering.clusterConfidentIndices()?"
         self.clustering.clusterConfidentIndices()
+        self.detectionResult = self.clustering.detectionResult
         self.detectionResult.containsValidData = True
-    """
-    def detecting(self, i):
-        #multiprocessing stuff .. what ??
-        print "detecting"
-        index = TLD_WINDOW_SIZE*i
-        window = self.windows[index:index+4]
-        if len(window) < 4:
-            pass
-        if self.foregroundDetector.isActive():
-            print "foregroundDetector Active"
-            isInside = False
-            print "inInside False"
-            for j in xrange(len(self.detectionResult.fgList)):
-                bgBox = self.detectionResult.fgList[j:j+4]
-                if tldIsInside(window, bgBox):
-                    isInside = True
-                else:
-                    isInside = False
-            if not isInside:
-                self.detectionResult.posteriors[i] = 0
-                #continue
-                pass
-        if not self.varianceFilter.filter(i):
-            self.detectionResult.posteriors[i] = 0
-            #continue
-            pass
-        if not self.ensembleClassifier.filter(i):
-            #continue
-            pass
-        if not self.nnClassifier.filter(img,i):
-            #continue
-            pass
-            
-        self.detectionResult.confidentIndices.append(i)
-        
-        #self.clustering.clusterConfidentIndices()
-        #self.detectionResult.containsValidData = True
-    """
+        '''
+        print id(self.foregroundDetector.detectionResult)
+        print id(self.detectionResult)
+        print id(self.varianceFilter.detectionResult)
+        print id(self.ensembleClassifier.detectionResult)
+        print id(self.nnClassifier.detectionResult)
+        print id(self.clustering.detectionResult)
+        '''
     def cleanPreviousData(self):
         self.detectionResult.reset()
         

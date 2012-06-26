@@ -65,8 +65,8 @@ class TLD:
         self.currImg = grey_frame
         if self.trackEnabled:
             self.medianFlowTracker.track(self.prevImg, self.currImg, self.prevBB)
-            if self.medianFlowTracker.trackerBB:
-                self.detectorCascade.detectionResult.detectorBB = self.medianFlowTracker.trackerBB
+            #if self.medianFlowTracker.trackerBB:
+                #self.detectorCascade.detectionResult.detectorBB = self.medianFlowTracker.trackerBB
         if self.detectorEnabled and (not self.alternating or not self.medianFlowTracker.trackerBB):
             self.detectorCascade.detect(grey_frame)
             
@@ -78,7 +78,7 @@ class TLD:
         trackerBB = self.medianFlowTracker.trackerBB
         print trackerBB
         numClusters = self.detectorCascade.detectionResult.numClusters
-        #print numClusters
+        print numClusters
         detectorBB = self.detectorCascade.detectionResult.detectorBB
         print detectorBB
         
@@ -114,6 +114,8 @@ class TLD:
         print self.currBB
                 
     def initialLearning(self):
+        print "initialLearning"
+        #raw_input()
         self.learning = True
         self.detectionResult = self.detectorCascade.detectionResult
         self.detectorCascade.detect(self.currImg)
@@ -126,11 +128,12 @@ class TLD:
         self.detectorCascade.varianceFilter.minVar = initVar/2
         
         overlap = tldOverlapRect(self.detectorCascade.windows, self.detectorCascade.numWindows, self.currBB)
+        #print overlap
+        #raw_input()
         
         positiveIndices = []
         negativeIndices = []
-        #print len(overlap)
-        #print self.detectorCascade.numWindows
+        
         for i in xrange(len(overlap)):
             if overlap[i] > 0.6:
                 positiveIndices.append((i,overlap[i]))
@@ -146,6 +149,8 @@ class TLD:
         
         numIterations = min(len(positiveIndices), 10)
         for i in xrange(numIterations):
+            print "self.detectorCascade.ensembleClassifier.learn"
+            raw_input()
             idx = positiveIndices[i][0]
             self.detectorCascade.ensembleClassifier.learn(self.currImg, 
                          self.detectorCascade.windows[TLD_WINDOW_SIZE*idx:], 

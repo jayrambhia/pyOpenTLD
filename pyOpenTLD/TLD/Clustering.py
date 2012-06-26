@@ -13,7 +13,7 @@ class Clustering:
         self.windows = None
         self.numWindows = 0
         
-    def calcMeantRect(self, indices):
+    def calcMeanRect(self, indices):
         x=y=w=h=0
         numIndices = len(indices)
         for i in xrange(numIndices):
@@ -27,7 +27,8 @@ class Clustering:
         y /= numIndices
         w /= numIndices
         h /= numIndices
-        
+        #print "calcMeanRect",
+        #print x,y,w,h
         self.detectionResult.detectorBB = [None]*4
         self.detectionResult.detectorBB[0] = floor(x+0.5)
         self.detectionResult.detectorBB[1] = floor(y+0.5)
@@ -54,13 +55,17 @@ class Clustering:
         distances = self.calcDistances(distances)
         clusterIndices = [0]*(numConfidentIndices)
         self.cluster(distances, clusterIndices)
+        #print self.detectionResult.numClusters,
+        #print "self.detectionResult.numClusters"
         if(self.detectionResult.numClusters == 1):
             self.calcMeanRect(self.detectionResult.confidentIndices)
             
     def cluster(self, distances, clusterIndices):
+        #print "cluster"
         numConfidentIndices = len(self.detectionResult.confidentIndices)
-
+        #print numConfidentIndices
         if(numConfidentIndices == 1):
+            #print "numConfidentIndices=1"
             clusterIndices[0] = 0
             self.detectionResult.numClusters = 1
             return

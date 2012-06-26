@@ -150,7 +150,6 @@ def predictBB(bb0, pt0, pt1, nPts):
     
     dx = getMedianUnmanaged(ofx)
     dy = getMedianUnmanaged(ofy)
-    ofx=ofy=0
     
     #lenPdist = nPts * (nPts - 1) / 2
     dist0=[]
@@ -164,7 +163,7 @@ def predictBB(bb0, pt0, pt1, nPts):
     
     s0 = 0.5 * (shift - 1) * getBBWidth(bb0)
     s1 = 0.5 * (shift - 1) * getBBHeight(bb0)
-    
+    """
     if shift == 0:
         shift = 1
     x1 = bb0[0] - s0 + dx
@@ -181,14 +180,20 @@ def predictBB(bb0, pt0, pt1, nPts):
         y2 = bb0[3]
         
     bb1 = (x1,y1,x2,y2)
-              
+    """
+    bb1 = [0]*4
+    bb1[0] = bb0[0] - s0 + dx
+    bb1[1] = bb0[1] - s1 + dy
+    bb1[2] = bb0[2] + s0 + dx
+    bb1[3] = bb0[3] + s1 + dy
+  
     return (bb1, shift)
     
 def getBB(pt0,pt1):
-    xmax = np.max((pt0[0],pt1[0]))
-    xmin = np.min((pt0[0],pt1[0]))
-    ymax = np.max((pt0[1],pt1[1]))
-    ymin = np.min((pt0[1],pt1[1]))
+    xmax = max((pt0[0],pt1[0]))
+    xmin = min((pt0[0],pt1[0]))
+    ymax = max((pt0[1],pt1[1]))
+    ymin = min((pt0[1],pt1[1]))
     return xmin,ymin,xmax,ymax
     
 def getRectFromBB(bb):
