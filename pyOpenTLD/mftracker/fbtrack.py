@@ -25,15 +25,13 @@ def fbtrack(imgI, imgJ, bb, numM=10, numN=10,margin=5,winsize_ncc=10):
     
     """
     nPoints = numM*numN
-    #sizePointsArray = nPoints*2
-    
+    sizePointsArray = nPoints*2
+    #print bb, "passed in fbtrack"
     pt = getFilledBBPoints(bb, numM, numN, margin)
     fb, ncc, status, ptTracked = lktrack(imgI, imgJ, pt, nPoints, winsize_ncc)
-    
-    nlkPoints = 0
-    for i in range(nPoints):
-        nlkPoints += status[i][0]
 
+    nlkPoints = sum(status)[0]
+    
     startPoints = []
     targetPoints = []
     fbLKCleaned = [0.0]*nlkPoints
@@ -46,7 +44,7 @@ def fbtrack(imgI, imgJ, bb, numM=10, numN=10,margin=5,winsize_ncc=10):
             startPoints.append((pt[2 * i],pt[2*i+1]))
             targetPoints.append((ptTracked[2 * i], ptTracked[2 * i + 1]))
             fbLKCleaned[nRealPoints]=fb[i]
-            nccLKCleaned[nRealPoints]=ncc[i][0][0]
+            nccLKCleaned[nRealPoints]=ncc[i]
             nRealPoints+=1
             
     medFb = getMedian(fbLKCleaned)
@@ -60,6 +58,7 @@ def fbtrack(imgI, imgJ, bb, numM=10, numN=10,margin=5,winsize_ncc=10):
             nAfterFbUsage+=1
 
     newBB, scaleshift = predictBB(bb, startPoints, targetPoints, nAfterFbUsage)
-    
+    #print newBB, "fbtrack passing newBB"
     return (newBB, scaleshift)
+
 

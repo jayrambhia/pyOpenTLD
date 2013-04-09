@@ -1,11 +1,11 @@
-from cv2 import *
-from cv2.cv import *
+import cv2
+import cv2.cv as cv
 import math
 import time
 import numpy as np
 import scipy.spatial.distance as spsd
 
-def lktrack(imgI, imgJ, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM_CCOEFF_NORMED):
+def lktrack(img1, img2, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=cv2.cv.CV_TM_CCOEFF_NORMED):
     """
     **SUMMARY**
     
@@ -33,7 +33,7 @@ def lktrack(imgI, imgJ, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM
     template_pt = []
     target_pt = []
     fb_pt = []
-    ptsJ = [0.0]*len(ptsI)
+    ptsJ = [-1]*len(ptsI)
     
     for i in range(nPtsI):
         template_pt.append((ptsI[2*i],ptsI[2*i+1]))
@@ -44,36 +44,28 @@ def lktrack(imgI, imgJ, ptsI, nPtsI, winsize_ncc=10, win_size_lk=4, method=CV_TM
     target_pt = np.asarray(target_pt,dtype="float32")
     fb_pt = np.asarray(fb_pt,dtype="float32")
     
-    img1 = imgI.getGrayNumpy()
-    img2 = imgJ.getGrayNumpy()
-    
-    target_pt, status, track_error = calcOpticalFlowPyrLK(img1, img2, template_pt, target_pt, 
-                                     winSize=(win_size_lk, win_size_lk), flags = OPTFLOW_USE_INITIAL_FLOW,
-                                     criteria = (TERM_CRITERIA_EPS | TERM_CRITERIA_COUNT, 10, 0.03))
+    target_pt, status, track_error = cv2.calcOpticalFlowPyrLK(img1, img2, template_pt, target_pt, 
+                                     winSize=(win_size_lk, win_size_lk), flags = cv2.OPTFLOW_USE_INITIAL_FLOW,
+                                     criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
                                      
-    fb_pt, status_bt, track_error_bt = calcOpticalFlowPyrLK(img2,img1, target_pt,fb_pt, 
-                                       winSize = (win_size_lk,win_size_lk),flags = OPTFLOW_USE_INITIAL_FLOW,
-                                       criteria = (TERM_CRITERIA_EPS | TERM_CRITERIA_COUNT, 10, 0.03))
+    fb_pt, status_bt, track_error_bt = cv2.calcOpticalFlowPyrLK(img2,img1, target_pt,fb_pt, 
+                                       winSize = (win_size_lk,win_size_lk),flags = cv2.OPTFLOW_USE_INITIAL_FLOW,
+                                       criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
     
-    for i in range(nPtsI):
-        if status[i] == 1 and status_bt[i] == 1:
-            status[i]=1
-        else:
-            status[i]=0
+    status = status & status_bt
     ncc = normCrossCorrelation(img1, img2, template_pt, target_pt, status, winsize_ncc, method)
     fb = euclideanDistance(template_pt, target_pt)
     
-    for i in range(nPtsI):
-        if status[i] == 1 and status_bt[i] == 1:
-            ptsJ[2 * i] = target_pt[i][0]
-            ptsJ[2 * i + 1] = target_pt[i][1]
-        else:
-            ptsJ[2 * i] = -1
-            ptsJ[2 * i + 1] = -1
-            fb[i] = -1
-            ncc[i] = -1
-            
-    return fb, ncc, status, ptsJ
+    newfb = -1*np.ones(len(fb))
+    newncc = -1*np.ones(len(ncc))
+    for i in np.argwhere(status):
+        i = i[0]
+        ptsJ[2 * i] = target_pt[i][0]
+        ptsJ[2 * i + 1] = target_pt[i][1]
+        newfb[i] = fb[i]
+        newncc[i] = ncc[i]
+
+    return newfb, newncc, status, ptsJ
     
 def euclideanDistance(point1,point2):
     """
@@ -90,13 +82,10 @@ def euclideanDistance(point1,point2):
     
     match = returns a vector of eculidean distance
     """
-    match=[]
-    n = len(point1)
-    for i in range(n):
-        match.append(spsd.euclidean(point1[i],point2[i]))
+    match = ((point1[:,0]-point2[:,0])**2+(point1[:,1]-point2[:,1])**2)**0.5
     return match
 
-def normCrossCorrelation(img1, img2, pt0, pt1, status, winsize, method=CV_TM_CCOEFF_NORMED):
+def normCrossCorrelation(img1, img2, pt0, pt1, status, winsize, method=cv2.cv.CV_TM_CCOEFF_NORMED):
     """
     **SUMMARY**
     
@@ -121,13 +110,11 @@ def normCrossCorrelation(img1, img2, pt0, pt1, status, winsize, method=CV_TM_CCO
             0.0 if not calculated.
  
     """
-    match = []
     nPts = len(pt0)
-    for i in range(nPts):
-        if status[i] == 1:
-            patch1 = getRectSubPix(img1,(winsize,winsize),tuple(pt0[i]))
-            patch2 = getRectSubPix(img2,(winsize,winsize),tuple(pt1[i]))
-            match.append(matchTemplate(patch1,patch2,method))
-        else:
-            match.append(0.0)
+    match = np.zeros(nPts)
+    for i in np.argwhere(status):
+        i = i[0]
+        patch1 = cv2.getRectSubPix(img1,(winsize,winsize),tuple(pt0[i]))
+        patch2 = cv2.getRectSubPix(img2,(winsize,winsize),tuple(pt1[i]))
+        match[i] = cv2.matchTemplate(patch1,patch2,method)
     return match
